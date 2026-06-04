@@ -1,0 +1,1052 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Silicon Canvas — Chip Designer</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Special+Elite&family=Share+Tech+Mono&family=Courier+Prime:ital,wght@0,400;0,700;1,400&display=swap');
+
+:root {
+  --paper: #f3eeff;
+  --paper2: #e8ddf7;
+  --paper3: #ddd0f5;
+  --ink: #1a0a2e;
+  --ink2: #3d2068;
+  --accent: #7c3aed;
+  --accent2: #a855f7;
+  --accent3: #c084fc;
+  --trace: #6d28d9;
+  --faint: rgba(124,58,237,0.07);
+  --faint2: rgba(124,58,237,0.13);
+  --grid: rgba(124,58,237,0.08);
+  --shadow: rgba(109,40,217,0.2);
+  --border: #7c3aed;
+  --block-stroke: #3d2068;
+  --label: #1a0a2e;
+  --sublabel: #5b21b6;
+  --sidebar-bg: #f0e8ff;
+  --sidebar-border: #c4b5fd;
+  --toolbar-bg: #ede0ff;
+  --bg: #f8f4ff;
+  --wire-color: #6d28d9;
+  --wire-hover: #a855f7;
+  --selected: #7c3aed;
+  --delete-red: #dc2626;
+}
+[data-theme="dark"] {
+  --paper: #0d0618;
+  --paper2: #130824;
+  --paper3: #1a0d2e;
+  --ink: #e8d5ff;
+  --ink2: #c4b5fd;
+  --accent: #a855f7;
+  --accent2: #7c3aed;
+  --accent3: #6d28d9;
+  --trace: #c084fc;
+  --faint: rgba(168,85,247,0.05);
+  --faint2: rgba(168,85,247,0.1);
+  --grid: rgba(168,85,247,0.08);
+  --shadow: rgba(168,85,247,0.3);
+  --border: #7c3aed;
+  --block-stroke: #c084fc;
+  --label: #e8d5ff;
+  --sublabel: #a78bfa;
+  --sidebar-bg: #0d0618;
+  --sidebar-border: #3d2068;
+  --toolbar-bg: #130824;
+  --bg: #080412;
+  --wire-color: #c084fc;
+  --wire-hover: #e879f9;
+  --selected: #c084fc;
+  --delete-red: #f87171;
+}
+
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-family:'Courier Prime',monospace;transition:background 0.6s,color 0.6s;}
+
+/* ── LAYOUT ── */
+#app{display:flex;flex-direction:column;height:100vh;width:100vw;}
+
+/* ── TOOLBAR ── */
+#toolbar{
+  display:flex;align-items:center;gap:6px;padding:7px 10px;
+  background:var(--toolbar-bg);border-bottom:1.5px solid var(--border);
+  flex-shrink:0;overflow-x:auto;scrollbar-width:none;
+  transition:background 0.6s,border-color 0.6s;
+  z-index:100;
+}
+#toolbar::-webkit-scrollbar{display:none;}
+
+.tb-title{
+  font-family:'Special Elite',cursive;font-size:13px;letter-spacing:3px;
+  color:var(--accent);white-space:nowrap;margin-right:6px;
+  transition:color 0.6s;
+}
+
+.tb-btn{
+  font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:1px;
+  padding:5px 10px;border:1px solid var(--border);background:transparent;
+  color:var(--accent);cursor:pointer;text-transform:uppercase;white-space:nowrap;
+  transition:all 0.2s;border-radius:1px;
+}
+.tb-btn:hover{background:var(--faint2);}
+.tb-btn.active{background:var(--accent);color:var(--paper);border-color:var(--accent);}
+.tb-btn.danger{border-color:var(--delete-red);color:var(--delete-red);}
+.tb-btn.danger:hover{background:var(--delete-red);color:#fff;}
+
+.tb-sep{width:1px;height:24px;background:var(--border);opacity:0.3;flex-shrink:0;}
+
+#status-bar{
+  font-family:'Share Tech Mono',monospace;font-size:8px;letter-spacing:1px;
+  color:var(--sublabel);white-space:nowrap;margin-left:auto;
+  transition:color 0.6s;
+}
+
+/* ── MAIN ── */
+#main{display:flex;flex:1;overflow:hidden;}
+
+/* ── SIDEBAR ── */
+#sidebar{
+  width:160px;flex-shrink:0;background:var(--sidebar-bg);
+  border-right:1.5px solid var(--sidebar-border);
+  display:flex;flex-direction:column;overflow:hidden;
+  transition:background 0.6s,border-color 0.6s;
+  z-index:50;
+}
+.sidebar-header{
+  padding:8px 10px;border-bottom:1px solid var(--sidebar-border);
+  font-family:'Share Tech Mono',monospace;font-size:8px;letter-spacing:2px;
+  color:var(--accent);text-transform:uppercase;
+  transition:color 0.6s,border-color 0.6s;
+}
+#block-list{flex:1;overflow-y:auto;padding:4px;scrollbar-width:thin;scrollbar-color:var(--accent) transparent;}
+#block-list::-webkit-scrollbar{width:3px;}
+#block-list::-webkit-scrollbar-thumb{background:var(--accent);opacity:0.4;}
+
+.block-category{
+  font-family:'Share Tech Mono',monospace;font-size:7px;letter-spacing:2px;
+  color:var(--accent);text-transform:uppercase;padding:6px 4px 3px;
+  border-bottom:1px solid var(--sidebar-border);margin-bottom:2px;
+  transition:color 0.6s;
+}
+
+.block-item{
+  display:flex;align-items:center;gap:6px;padding:5px 6px;
+  cursor:grab;border:1px solid transparent;border-radius:1px;
+  transition:all 0.15s;margin-bottom:1px;
+  user-select:none;
+}
+.block-item:hover{border-color:var(--border);background:var(--faint2);}
+.block-item:active{cursor:grabbing;}
+
+.bi-swatch{
+  width:12px;height:12px;border:1px solid var(--block-stroke);flex-shrink:0;
+  transition:border-color 0.6s;
+}
+.bi-label{
+  font-family:'Share Tech Mono',monospace;font-size:8px;
+  color:var(--label);letter-spacing:0.5px;line-height:1.2;
+  transition:color 0.6s;
+}
+
+/* ── CANVAS AREA ── */
+#canvas-wrap{flex:1;position:relative;overflow:hidden;background:var(--paper);transition:background 0.6s;}
+
+/* grid */
+#canvas-wrap::before{
+  content:'';position:absolute;inset:0;
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:24px 24px;pointer-events:none;z-index:0;transition:background-size 0.3s;
+}
+
+#svg-canvas{
+  position:absolute;inset:0;width:100%;height:100%;
+  cursor:crosshair;z-index:1;overflow:visible;
+}
+
+/* ── BLOCK STYLES ── */
+.chip-block{cursor:move;}
+.chip-block:hover .block-rect{filter:brightness(0.97);}
+.chip-block.selected .block-rect{stroke:var(--selected)!important;stroke-width:2!important;}
+.chip-block.selected .block-inner{stroke:var(--selected)!important;opacity:0.7;}
+
+/* ── WIRE ── */
+.wire-path{stroke:var(--wire-color);stroke-width:1.5;fill:none;cursor:pointer;transition:stroke 0.3s;}
+.wire-path:hover{stroke:var(--wire-hover);stroke-width:2.5;}
+.wire-preview{stroke:var(--accent2);stroke-width:1.2;fill:none;stroke-dasharray:5,3;pointer-events:none;}
+
+/* ── TOOLTIP / INSPECTOR ── */
+#inspector{
+  position:absolute;right:10px;top:10px;width:190px;
+  background:var(--toolbar-bg);border:1.5px solid var(--border);
+  padding:10px;z-index:200;display:none;
+  transition:background 0.6s,border-color 0.6s;
+  box-shadow:4px 4px 0 var(--shadow);
+}
+#inspector .ins-title{
+  font-family:'Special Elite',cursive;font-size:11px;color:var(--accent);
+  letter-spacing:2px;border-bottom:1px solid var(--border);padding-bottom:5px;margin-bottom:7px;
+}
+.ins-row{display:flex;justify-content:space-between;margin-bottom:4px;}
+.ins-key{font-family:'Share Tech Mono',monospace;font-size:8px;color:var(--sublabel);letter-spacing:1px;}
+.ins-val{font-family:'Courier Prime',monospace;font-size:8px;font-weight:700;color:var(--label);text-align:right;max-width:110px;}
+#ins-delete{
+  margin-top:8px;width:100%;font-family:'Share Tech Mono',monospace;font-size:8px;
+  padding:4px;border:1px solid var(--delete-red);background:transparent;
+  color:var(--delete-red);cursor:pointer;letter-spacing:1px;text-transform:uppercase;
+  transition:all 0.2s;
+}
+#ins-delete:hover{background:var(--delete-red);color:#fff;}
+
+/* ── WIRE PREVIEW OVERLAY ── */
+#wire-hint{
+  position:absolute;bottom:10px;left:50%;transform:translateX(-50%);
+  background:var(--toolbar-bg);border:1px solid var(--border);
+  padding:5px 14px;font-family:'Share Tech Mono',monospace;font-size:8px;
+  color:var(--accent);letter-spacing:2px;z-index:200;pointer-events:none;
+  display:none;text-transform:uppercase;
+}
+
+/* ── THEME FLASH ── */
+.t-flash{position:fixed;inset:0;background:var(--accent);opacity:0;pointer-events:none;z-index:9999;transition:opacity 0.12s;}
+.t-flash.on{opacity:0.07;}
+
+/* ── CORNER MARKS ── */
+.corner-mark{position:absolute;width:14px;height:14px;pointer-events:none;z-index:5;}
+.corner-mark svg{width:100%;height:100%;}
+.cm-tl{top:6px;left:6px;}
+.cm-tr{top:6px;right:6px;transform:scaleX(-1);}
+.cm-bl{bottom:6px;left:6px;transform:scaleY(-1);}
+.cm-br{bottom:6px;right:6px;transform:scale(-1,-1);}
+
+/* animations */
+@keyframes dashFlow{to{stroke-dashoffset:-16;}}
+.wire-animated{animation:dashFlow 1.6s linear infinite;}
+@keyframes blockIn{from{opacity:0;transform:scale(0.92);}to{opacity:1;transform:scale(1);}}
+.block-appear{animation:blockIn 0.2s ease both;}
+
+/* callout number bubbles */
+.callout-num{
+  font-family:'Courier Prime',monospace;font-size:10px;font-weight:700;
+  fill:var(--label);pointer-events:none;
+}
+</style>
+</head>
+<body data-theme="">
+<div class="t-flash" id="tflash"></div>
+
+<div id="app">
+
+  <!-- TOOLBAR -->
+  <div id="toolbar">
+    <span class="tb-title">⬡ SILICON CANVAS</span>
+    <div class="tb-sep"></div>
+    <button class="tb-btn active" id="btn-select" title="Select & Move (S)">✦ Select</button>
+    <button class="tb-btn" id="btn-wire" title="Draw Wire (W)">⟶ Wire</button>
+    <button class="tb-btn" id="btn-callout" title="Add Callout (C)">① Callout</button>
+    <div class="tb-sep"></div>
+    <button class="tb-btn" id="btn-zoomin" title="Zoom In (+)">＋ Zoom</button>
+    <button class="tb-btn" id="btn-zoomout" title="Zoom Out (-)">－ Zoom</button>
+    <button class="tb-btn" id="btn-fit" title="Fit canvas (F)">⊡ Fit</button>
+    <div class="tb-sep"></div>
+    <button class="tb-btn" id="btn-theme">◐ Dark</button>
+    <button class="tb-btn" id="btn-export">⬇ Export SVG</button>
+    <button class="tb-btn danger" id="btn-clearall">↺ Clear</button>
+    <div class="tb-sep"></div>
+    <span id="status-bar">BLOCKS: 0 · WIRES: 0 · DRAG FROM SIDEBAR TO PLACE</span>
+  </div>
+
+  <div id="main">
+
+    <!-- SIDEBAR -->
+    <div id="sidebar">
+      <div class="sidebar-header">⬡ Block Library</div>
+      <div id="block-list"></div>
+    </div>
+
+    <!-- CANVAS -->
+    <div id="canvas-wrap">
+      <div class="corner-mark cm-tl"><svg viewBox="0 0 14 14"><path d="M0,14 L0,0 L14,0" fill="none" stroke="var(--border)" stroke-width="1.2"/></svg></div>
+      <div class="corner-mark cm-tr"><svg viewBox="0 0 14 14"><path d="M0,14 L0,0 L14,0" fill="none" stroke="var(--border)" stroke-width="1.2"/></svg></div>
+      <div class="corner-mark cm-bl"><svg viewBox="0 0 14 14"><path d="M0,14 L0,0 L14,0" fill="none" stroke="var(--border)" stroke-width="1.2"/></svg></div>
+      <div class="corner-mark cm-br"><svg viewBox="0 0 14 14"><path d="M0,14 L0,0 L14,0" fill="none" stroke="var(--border)" stroke-width="1.2"/></svg></div>
+
+      <svg id="svg-canvas" xmlns="http://www.w3.org/2000/svg">
+        <defs id="svg-defs">
+          <pattern id="hp-cross" patternUnits="userSpaceOnUse" width="10" height="10">
+            <line x1="0" y1="0" x2="10" y2="10" stroke="#7c3aed" stroke-width="0.4" opacity="0.3"/>
+            <line x1="10" y1="0" x2="0" y2="10" stroke="#7c3aed" stroke-width="0.4" opacity="0.3"/>
+          </pattern>
+          <pattern id="hp-diag" patternUnits="userSpaceOnUse" width="8" height="8">
+            <line x1="0" y1="8" x2="8" y2="0" stroke="#7c3aed" stroke-width="0.5" opacity="0.3"/>
+          </pattern>
+          <pattern id="hp-horiz" patternUnits="userSpaceOnUse" width="8" height="7">
+            <line x1="0" y1="3.5" x2="8" y2="3.5" stroke="#7c3aed" stroke-width="0.4" opacity="0.3"/>
+          </pattern>
+          <pattern id="hp-vert" patternUnits="userSpaceOnUse" width="7" height="8">
+            <line x1="3.5" y1="0" x2="3.5" y2="8" stroke="#7c3aed" stroke-width="0.4" opacity="0.3"/>
+          </pattern>
+          <pattern id="hp-dots" patternUnits="userSpaceOnUse" width="8" height="8">
+            <circle cx="4" cy="4" r="0.9" fill="#7c3aed" opacity="0.3"/>
+          </pattern>
+          <pattern id="hp-grid" patternUnits="userSpaceOnUse" width="7" height="7">
+            <line x1="0" y1="0" x2="7" y2="0" stroke="#7c3aed" stroke-width="0.4" opacity="0.25"/>
+            <line x1="0" y1="0" x2="0" y2="7" stroke="#7c3aed" stroke-width="0.4" opacity="0.25"/>
+          </pattern>
+          <pattern id="hp-wave" patternUnits="userSpaceOnUse" width="12" height="6">
+            <path d="M0,3 Q3,0 6,3 Q9,6 12,3" fill="none" stroke="#7c3aed" stroke-width="0.5" opacity="0.3"/>
+          </pattern>
+          <pattern id="hp-brick" patternUnits="userSpaceOnUse" width="16" height="8">
+            <rect x="0" y="0" width="16" height="4" fill="none" stroke="#7c3aed" stroke-width="0.4" opacity="0.25"/>
+            <rect x="0" y="4" width="16" height="4" fill="none" stroke="#7c3aed" stroke-width="0.4" opacity="0.25"/>
+            <line x1="8" y1="0" x2="8" y2="4" stroke="#7c3aed" stroke-width="0.4" opacity="0.25"/>
+            <line x1="0" y1="4" x2="0" y2="8" stroke="#7c3aed" stroke-width="0.4" opacity="0.25"/>
+          </pattern>
+          <marker id="arr-fwd" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto">
+            <path d="M0,0 L0,7 L7,3.5 z" fill="#6d28d9"/>
+          </marker>
+          <marker id="arr-fwd-d" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto">
+            <path d="M0,0 L0,7 L7,3.5 z" fill="#c084fc"/>
+          </marker>
+          <marker id="arr-bi" markerWidth="5" markerHeight="5" refX="1" refY="2.5" orient="auto-start-reverse">
+            <path d="M5,0 L5,5 L0,2.5 z" fill="#6d28d9"/>
+          </marker>
+        </defs>
+        <g id="wires-layer"></g>
+        <g id="blocks-layer"></g>
+        <g id="callouts-layer"></g>
+        <line id="wire-preview-line" class="wire-preview" x1="0" y1="0" x2="0" y2="0" style="display:none"/>
+      </svg>
+
+      <!-- INSPECTOR -->
+      <div id="inspector">
+        <div class="ins-title" id="ins-title">BLOCK INFO</div>
+        <div id="ins-rows"></div>
+        <button id="ins-delete">✕ Delete Block</button>
+      </div>
+
+      <!-- WIRE HINT -->
+      <div id="wire-hint">CLICK BLOCK TO START WIRE · CLICK ANOTHER TO CONNECT</div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════════
+// BLOCK DEFINITIONS — full silicon dump
+// ══════════════════════════════════════════════════════
+const CATEGORIES = [
+  { name: 'COMPUTE', blocks: [
+    { id:'cpu',     label:'CPU CORE',      sub:'ARM A78 · OOO · 3GHz',       fill:'#ede8ff', hatch:'hp-cross',  w:160, h:110,
+      specs:{'Type':'Superscalar OOO','ISA':'ARMv9-A','Freq':'Up to 3.2 GHz','Pipeline':'13-stage','IPC':'~5','L1-I':'64KB','L1-D':'64KB'} },
+    { id:'cpu_e',   label:'CPU E-CORE',    sub:'ARM A55 · InO · 2GHz',        fill:'#ede8ff', hatch:'hp-diag',   w:140, h:90,
+      specs:{'Type':'In-Order Efficient','ISA':'ARMv9-A','Freq':'Up to 2.0 GHz','Pipeline':'8-stage','L1-I':'32KB','L1-D':'32KB'} },
+    { id:'gpu',     label:'GPU CLUSTER',   sub:'Shader · Texture · ROP',      fill:'#e8e0ff', hatch:'hp-grid',   w:180, h:130,
+      specs:{'Shaders':'2048 FP32','TMUs':'128','ROPs':'64','API':'Vulkan 1.3 / OpenGL 3.2','Freq':'1.2 GHz','TFLOPS':'4.9'} },
+    { id:'npu',     label:'NPU / AI CORE', sub:'MAC Array · 8 TOPS',          fill:'#e0d8ff', hatch:'hp-grid',   w:150, h:120,
+      specs:{'MACs':'4096 INT8','Peak':'8 TOPS','Precision':'INT4/INT8/FP16','SRAM':'2MB','Ops':'Conv/Attn/GEMM'} },
+    { id:'dsp',     label:'DSP ENGINE',    sub:'Hexagon · VLIW · SIMD',       fill:'#ece8ff', hatch:'hp-wave',   w:140, h:90,
+      specs:{'Arch':'VLIW-4','SIMD':'128-bit','Freq':'1.2 GHz','TOPS':'1.2','Use':'Audio/Sensor/CV'} },
+    { id:'vpu',     label:'VIDEO CODEC',   sub:'H.265/AV1 · 8K Decode',       fill:'#e8e4ff', hatch:'hp-cross',  w:155, h:85,
+      specs:{'Decode':'H.264/H.265/AV1/VP9','Encode':'H.264/H.265','Max':'8K30 Dec / 4K60 Enc','HDR':'HDR10+'} },
+  ]},
+  { name: 'CACHE & MEMORY', blocks: [
+    { id:'l1i',  label:'L1-I CACHE',   sub:'64KB · 4-Way · VIPT',    fill:'#e8f0e8', hatch:'hp-horiz', w:120, h:60,
+      specs:{'Size':'64KB','Assoc':'4-Way','Policy':'VIPT','Latency':'4 cycles','ECC':'Yes'} },
+    { id:'l1d',  label:'L1-D CACHE',   sub:'64KB · 4-Way · PIPT',    fill:'#e8f0e8', hatch:'hp-horiz', w:120, h:60,
+      specs:{'Size':'64KB','Assoc':'4-Way','Policy':'PIPT','Latency':'4 cycles','ECC':'Yes'} },
+    { id:'l2',   label:'L2 CACHE',     sub:'512KB · 8-Way · Unified', fill:'#ddeedd', hatch:'hp-brick', w:140, h:65,
+      specs:{'Size':'512KB','Assoc':'8-Way','Latency':'12 cycles','ECC':'Yes','Incl':'Exclusive'} },
+    { id:'l3',   label:'L3 CACHE',     sub:'8MB · 16-Way · SRAM',     fill:'#d4e8d4', hatch:'hp-brick', w:160, h:70,
+      specs:{'Size':'8MB','Assoc':'16-Way','Latency':'~40 cycles','ECC':'SECDED','Shared':'All cores'} },
+    { id:'lpddr',label:'LPDDR5 CTRL',  sub:'128-bit · 68 GB/s',       fill:'#d8e8f0', hatch:'hp-horiz', w:155, h:90,
+      specs:{'Standard':'LPDDR5X','Width':'128-bit','Speed':'8533 Mbps/pin','BW':'68 GB/s','Cap':'Up to 16GB','ECC':'Yes'} },
+    { id:'sram', label:'SRAM BANK',    sub:'512KB · 6T · Single Cycle',fill:'#dde8ee', hatch:'hp-vert',  w:130, h:70,
+      specs:{'Size':'512KB','Cell':'6T SRAM','Access':'Single cycle','Retention':'Yes','ECC':'Optional'} },
+    { id:'rom',  label:'BOOT ROM',     sub:'128KB · Immutable',        fill:'#e8eedc', hatch:'hp-dots',  w:120, h:60,
+      specs:{'Size':'128KB','Type':'Mask ROM','Content':'BL0 Bootloader','Security':'Immutable','Prot':'Secure read'} },
+    { id:'ufs',  label:'UFS 3.1 CTRL', sub:'2.9 GB/s · HS-G4',        fill:'#dde8e0', hatch:'hp-brick', w:145, h:80,
+      specs:{'Standard':'UFS 3.1','Read':'2.9 GB/s','Write':'1.2 GB/s','PHY':'M-PHY HS-G4','Lanes':'×2'} },
+    { id:'dma',  label:'DMA ENGINE',   sub:'16-Ch · Scatter-Gather',   fill:'#e0eedc', hatch:'hp-diag',  w:130, h:70,
+      specs:{'Channels':'16','Mode':'Scatter-Gather','Transfer':'Mem-Mem / Periph','IRQ':'Per channel','Width':'64-bit'} },
+    { id:'coh',  label:'CACHE COHERENCY',sub:'MESI · Snoop Filter',   fill:'#ddeee8', hatch:'hp-cross',  w:155, h:70,
+      specs:{'Protocol':'MESI','Impl':'CCI-550','Snoop':'Directory + Filter','Ports':'8','BW':'512 GB/s'} },
+  ]},
+  { name: 'INTERCONNECT', blocks: [
+    { id:'ahb',  label:'AHB BUS',      sub:'256-bit · High Perf',      fill:'#e8e4d8', hatch:'hp-horiz', w:260, h:36,
+      specs:{'Standard':'AMBA AHB5','Width':'256-bit','Freq':'1 GHz','Prot':'Burst/INCR/WRAP','Masters':'16'} },
+    { id:'apb',  label:'APB BUS',      sub:'32-bit · Peripheral',      fill:'#e8e4d0', hatch:'hp-horiz', w:260, h:32,
+      specs:{'Standard':'AMBA APB4','Width':'32-bit','Use':'Slow peripherals','Latency':'Low priority'} },
+    { id:'noc',  label:'NoC FABRIC',   sub:'Mesh Topology · QoS',      fill:'#e4e0d8', hatch:'hp-cross', w:200, h:55,
+      specs:{'Topology':'2D Mesh','Width':'512-bit','QoS':'4 priority levels','Arb':'Round-robin + WFQ','Freq':'1.5 GHz'} },
+    { id:'axi',  label:'AXI BUS',      sub:'128-bit · Split Trans.',   fill:'#e8e2d4', hatch:'hp-diag',  w:200, h:40,
+      specs:{'Standard':'AMBA AXI5','Width':'128-bit','Channels':'5 (AW/W/B/AR/R)','Outstanding':'16'} },
+  ]},
+  { name: 'I/O & INTERFACE', blocks: [
+    { id:'usb',  label:'USB 3.2 GEN2', sub:'10 Gbps · Type-C · PD3',  fill:'#e8f0f8', hatch:'hp-dots',  w:145, h:80,
+      specs:{'Speed':'10 Gbps','Connector':'Type-C','PD':'3.0 · 100W','Alt':'DP 1.4 / TBT3','PHY':'USB 3.2'} },
+    { id:'pcie', label:'PCIe 4.0',     sub:'×4 · 16 GT/s · NVMe',     fill:'#e0e8f0', hatch:'hp-diag',  w:140, h:80,
+      specs:{'Gen':'PCIe 4.0','Lanes':'×4','BW':'8 GB/s','Use':'NVMe / WiFi / GPU','ASPM':'L0s/L1/L1.1/L1.2'} },
+    { id:'mipi', label:'MIPI CSI/DSI', sub:'4-Lane · Camera + Display',fill:'#e8eef8', hatch:'hp-wave',  w:155, h:80,
+      specs:{'CSI':'D-PHY 4-Lane 4.5 Gbps','DSI':'D-PHY 4-Lane 2.5 Gbps','Use':'Camera/Display','Ver':'CSI-2 v3.0'} },
+    { id:'eth',  label:'ETHERNET MAC', sub:'GbE / 2.5GbE · RGMII',    fill:'#e4eef4', hatch:'hp-horiz', w:140, h:75,
+      specs:{'Speed':'1G / 2.5G','PHY IF':'RGMII / SGMII','IEEE':'802.3','Features':'EEE / WoL / TSN'} },
+    { id:'wifi', label:'WiFi 6E / BT', sub:'802.11ax · 6GHz · BLE5',  fill:'#e8f4f0', hatch:'hp-wave',  w:155, h:80,
+      specs:{'WiFi':'802.11ax 6E','Bands':'2.4 / 5 / 6 GHz','MIMO':'4×4','BT':'5.3 + BLE','Speed':'9.6 Gbps'} },
+    { id:'5g',   label:'5G MODEM',     sub:'Sub-6 + mmWave · 7.5Gbps', fill:'#e0eef8', hatch:'hp-diag',  w:155, h:85,
+      specs:{'Bands':'Sub-6GHz + mmWave','DL':'7.5 Gbps','UL':'3.5 Gbps','4G':'LTE Cat-24 fallback','SA/NSA':'Yes'} },
+    { id:'periph',label:'PERIPH CTRL', sub:'UART/SPI/I²C/GPIO/PWM',   fill:'#e8f0e8', hatch:'hp-brick', w:165, h:80,
+      specs:{'UART':'×4','SPI':'×3','I2C':'×6','I2S':'×2','CAN':'×2','GPIO':'×64','PWM':'×8','ADC':'×12 12-bit'} },
+    { id:'isp',  label:'ISP',          sub:'200MP · RAW→RGB · HDR',    fill:'#eef0f8', hatch:'hp-grid',  w:150, h:80,
+      specs:{'MaxRes':'200 MP','Pipeline':'RAW→Demosaic→NR→AWB→AE→Gamma','HDR':'3-frame HDR','EIS':'Yes'} },
+    { id:'disp', label:'DISPLAY ENGINE',sub:'4K120 · HDR10+ · Scaler', fill:'#e8ecf8', hatch:'hp-cross', w:160, h:80,
+      specs:{'Max':'4K120 / 1440p144','Color':'HDR10+ / DCI-P3 / BT.2020','Layers':'Blending ×8','Output':'DSI/DP/HDMI'} },
+    { id:'audio',label:'AUDIO DSP',    sub:'192kHz · AEC · Spatial',   fill:'#eef8f4', hatch:'hp-wave',  w:145, h:70,
+      specs:{'Sample':'Up to 192 kHz','Depth':'32-bit','Features':'AEC/NS/Beamform/Spatialization','Codec':'AAC/FLAC/Opus'} },
+  ]},
+  { name: 'ANALOG & CLOCK', blocks: [
+    { id:'pll',  label:'PLL ARRAY',    sub:'CPU/GPU/DDR/IO PLLs',      fill:'#f0ece0', hatch:'hp-dots',  w:140, h:90,
+      specs:{'PLLs':'5× APLL + DPLL + GPLL','Range':'100MHz–4GHz','Jitter':'<0.5ps RMS','Lock':'<10μs'} },
+    { id:'adc',  label:'ADC / DAC',    sub:'12-bit SAR · 16-bit DAC',  fill:'#f0e8dc', hatch:'hp-wave',  w:140, h:80,
+      specs:{'ADC':'12-bit SAR × 12ch','Rate':'2 MSPS','DAC':'16-bit × 2ch','Ref':'1.8V/3.3V','SNR':'72 dB'} },
+    { id:'osc',  label:'OSC / RTC',    sub:'38.4MHz TCXO · 32kHz',     fill:'#ece8d8', hatch:'hp-cross', w:130, h:75,
+      specs:{'Main':'38.4 MHz TCXO','RTC':'32.768 kHz crystal','Accuracy':'±2ppm','Tamper':'GPIO trigger'} },
+    { id:'thermal',label:'THERMAL MGMT',sub:'16× Sensors · DPTM',     fill:'#f4ece0', hatch:'hp-diag',  w:145, h:70,
+      specs:{'Sensors':'16× diode-based','Resolution':'0.5°C','DPTM':'Dynamic Power/Thermal Mgmt','Fan':'PWM ctrl'} },
+    { id:'phy',  label:'USB/PCIe PHY', sub:'SerDes · PIPE4 · CDR',     fill:'#eceeff', hatch:'hp-vert',  w:140, h:70,
+      specs:{'Type':'SerDes','Protocol':'USB 3.2 / PCIe 4.0','EQ':'Adaptive CTLE/DFE','CDR':'Full-rate'} },
+    { id:'dpphy',label:'DP / LVDS PHY',sub:'DP 2.0 · HDMI 2.1 · 20G', fill:'#e8ecff', hatch:'hp-brick', w:140, h:70,
+      specs:{'DP':'2.0 · UHBR20','HDMI':'2.1 · 48Gbps','LVDS':'4-pair','EQ':'TX/RX equalization'} },
+  ]},
+  { name: 'SECURITY & POWER', blocks: [
+    { id:'sec',  label:'SECURE ENCLAVE',sub:'TrustZone · AES/RSA/ECC', fill:'#f0e8f8', hatch:'hp-grid',  w:200, h:120,
+      specs:{'TrustZone':'ARM TF-A','Crypto':'AES-256/RSA-4096/ECC-521','RNG':'TRNG NIST SP800-90B','Key':'4Kbit eFuse vault','Boot':'Secure chain'} },
+    { id:'pmic', label:'PMIC IF',       sub:'SPMI · 16 Rails · DVFS',  fill:'#f4e8f0', hatch:'hp-cross', w:140, h:85,
+      specs:{'Bus':'SPMI','Rails':'16× LDO/Buck/Boost','Range':'0.5–3.6V','DVFS':'Per-domain AVS','Response':'<10μs'} },
+    { id:'pwrdom',label:'POWER DOMAINS',sub:'VDD_CORE/GPU/MEM/IO',    fill:'#f0e4ec', hatch:'hp-diag',   w:150, h:90,
+      specs:{'Domains':'VDD_CORE/GPU/MEM/IO/PLL','Gating':'Fine-grained power islands','States':'ON/OFF/RET/DORMANT'} },
+    { id:'wdog', label:'WDOG / TRNG',   sub:'HW Watchdog · NIST RNG',  fill:'#f8eef4', hatch:'hp-dots',  w:140, h:65,
+      specs:{'Watchdog':'×4 independent','TRNG':'Physical entropy source','NIST':'SP800-90B compliant','Reseed':'Auto'} },
+    { id:'efuse',label:'eFUSE / OTP',   sub:'4Kbit · Device ID · Keys',fill:'#f4eef8', hatch:'hp-horiz', w:135, h:65,
+      specs:{'Size':'4Kbit antifuse','Content':'DeviceID/Keys/Trim','Program':'One-time irreversible','Secure':'Zone lockdown'} },
+    { id:'ivr',  label:'ON-DIE IVR',    sub:'Per-core AVS · 5mV steps',fill:'#ece8f4', hatch:'hp-vert',  w:155, h:70,
+      specs:{'Type':'Integrated Voltage Regulator','Granularity':'Per-core','Step':'5mV','Response':'<1μs','Style':'FIVR'} },
+    { id:'clknet',label:'CLOCK NETWORK',sub:'H-Tree · <20ps skew',     fill:'#e8e4f0', hatch:'hp-wave',  w:185, h:65,
+      specs:{'Topology':'H-Tree distribution','Skew':'<20ps','Domains':'512 gating domains','CCF':'Linux clock framework'} },
+    { id:'padring',label:'I/O PAD RING',sub:'BGA 512-pin · ESD',       fill:'#f0ecf8', hatch:'hp-brick', w:200, h:50,
+      specs:{'Package':'BGA 512-pin','ESD':'±8kV HBM','Latchup':'Immune','Voltage':'1.8V / 3.3V tolerant'} },
+    { id:'jtag', label:'JTAG / SCAN',   sub:'IEEE 1149.1 · ATPG · BIST',fill:'#eceef8',hatch:'hp-cross', w:155, h:65,
+      specs:{'JTAG':'IEEE 1149.1','DFT':'ATPG / MBIST / LBIST','Boundary':'Scan chain','TAP':'Secure lock'} },
+    { id:'proc', label:'PROCESS NODE',  sub:'TSMC N4P · FinFET',       fill:'#e8ecff', hatch:'hp-grid',  w:145, h:65,
+      specs:{'Foundry':'TSMC','Node':'N4P (4nm class)','Type':'FinFET','Density':'~100 MTr/mm²','Die':'~100 mm²'} },
+  ]},
+];
+
+// flat lookup
+const BLOCK_MAP = {};
+CATEGORIES.forEach(cat => cat.blocks.forEach(b => { BLOCK_MAP[b.id] = b; }));
+
+// ══════════════════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════════════════
+let blocks = [];      // {uid, defId, x, y, w, h, el}
+let wires = [];       // {uid, fromUid, toUid, el}
+let callouts = [];    // {uid, x, y, lx, ly, num, el}
+let calloutCounter = 1;
+let selectedBlock = null;
+let mode = 'select'; // select | wire | callout
+let wireFromUid = null;
+let dark = false;
+let zoom = 1;
+let panX = 0, panY = 0;
+let isDraggingBlock = false;
+let isPanning = false;
+let dragOffset = {x:0,y:0};
+let panStart = {x:0,y:0};
+let calloutPhase = 0; // 0=pick anchor, 1=pick label pos
+let pendingCallout = null;
+
+const svg = document.getElementById('svg-canvas');
+const wiresLayer = document.getElementById('wires-layer');
+const blocksLayer = document.getElementById('blocks-layer');
+const calloutsLayer = document.getElementById('callouts-layer');
+const inspector = document.getElementById('inspector');
+const wireHint = document.getElementById('wire-hint');
+const statusBar = document.getElementById('status-bar');
+
+// ══════════════════════════════════════════════════════
+// BUILD SIDEBAR
+// ══════════════════════════════════════════════════════
+const blockList = document.getElementById('block-list');
+CATEGORIES.forEach(cat => {
+  const catEl = document.createElement('div');
+  catEl.className = 'block-category';
+  catEl.textContent = cat.name;
+  blockList.appendChild(catEl);
+  cat.blocks.forEach(b => {
+    const item = document.createElement('div');
+    item.className = 'block-item';
+    item.draggable = true;
+    item.dataset.defId = b.id;
+    item.innerHTML = `<div class="bi-swatch" style="background:${b.fill}"></div><div class="bi-label">${b.label}<br><span style="font-size:6.5px;opacity:0.6">${b.sub}</span></div>`;
+    item.addEventListener('dragstart', e => {
+      e.dataTransfer.setData('defId', b.id);
+    });
+    // touch drag for mobile
+    item.addEventListener('touchstart', onSidebarTouchStart, {passive:false});
+    blockList.appendChild(item);
+  });
+});
+
+// ══════════════════════════════════════════════════════
+// COORDINATE HELPERS
+// ══════════════════════════════════════════════════════
+function getCanvasPoint(clientX, clientY) {
+  const rect = svg.getBoundingClientRect();
+  return {
+    x: (clientX - rect.left - panX) / zoom,
+    y: (clientY - rect.top  - panY) / zoom,
+  };
+}
+function snap(v, g=8) { return Math.round(v/g)*g; }
+function applyTransform() {
+  blocksLayer.setAttribute('transform', `translate(${panX},${panY}) scale(${zoom})`);
+  wiresLayer.setAttribute('transform', `translate(${panX},${panY}) scale(${zoom})`);
+  calloutsLayer.setAttribute('transform', `translate(${panX},${panY}) scale(${zoom})`);
+}
+
+// ══════════════════════════════════════════════════════
+// BLOCK RENDERING
+// ══════════════════════════════════════════════════════
+function renderBlock(b) {
+  const def = BLOCK_MAP[b.defId];
+  const g = document.createElementNS('http://www.w3.org/2000/svg','g');
+  g.setAttribute('class','chip-block block-appear');
+  g.dataset.uid = b.uid;
+
+  // main rect
+  const rect = document.createElementNS('http://www.w3.org/2000/svg','rect');
+  rect.setAttribute('class','block-rect');
+  rect.setAttribute('x', b.x); rect.setAttribute('y', b.y);
+  rect.setAttribute('width', b.w); rect.setAttribute('height', b.h);
+  rect.setAttribute('fill', def.fill);
+  rect.setAttribute('stroke', 'var(--block-stroke)');
+  rect.setAttribute('stroke-width', '1');
+  rect.setAttribute('rx','1');
+  g.appendChild(rect);
+
+  // hatch overlay
+  const hatch = document.createElementNS('http://www.w3.org/2000/svg','rect');
+  hatch.setAttribute('x', b.x); hatch.setAttribute('y', b.y);
+  hatch.setAttribute('width', b.w); hatch.setAttribute('height', b.h);
+  hatch.setAttribute('fill', `url(#${def.hatch})`);
+  hatch.setAttribute('rx','1');
+  g.appendChild(hatch);
+
+  // inner dashed rect
+  const inner = document.createElementNS('http://www.w3.org/2000/svg','rect');
+  inner.setAttribute('class','block-inner');
+  inner.setAttribute('x', b.x+5); inner.setAttribute('y', b.y+5);
+  inner.setAttribute('width', b.w-10); inner.setAttribute('height', b.h-10);
+  inner.setAttribute('fill','none');
+  inner.setAttribute('stroke','var(--block-stroke)');
+  inner.setAttribute('stroke-width','0.4');
+  inner.setAttribute('stroke-dasharray','2,2');
+  inner.setAttribute('opacity','0.4');
+  g.appendChild(inner);
+
+  // label
+  const txt = document.createElementNS('http://www.w3.org/2000/svg','text');
+  txt.setAttribute('x', b.x + b.w/2);
+  txt.setAttribute('y', b.y + b.h/2 - 4);
+  txt.setAttribute('text-anchor','middle');
+  txt.setAttribute('dominant-baseline','middle');
+  txt.setAttribute('font-family','Share Tech Mono, monospace');
+  txt.setAttribute('font-size', Math.min(11, b.w/12));
+  txt.setAttribute('fill','var(--label)');
+  txt.setAttribute('letter-spacing','1');
+  txt.setAttribute('pointer-events','none');
+  txt.textContent = def.label;
+  g.appendChild(txt);
+
+  // sub-label
+  const sub = document.createElementNS('http://www.w3.org/2000/svg','text');
+  sub.setAttribute('x', b.x + b.w/2);
+  sub.setAttribute('y', b.y + b.h/2 + 12);
+  sub.setAttribute('text-anchor','middle');
+  sub.setAttribute('dominant-baseline','middle');
+  sub.setAttribute('font-family','Courier Prime, monospace');
+  sub.setAttribute('font-size', Math.min(8, b.w/18));
+  sub.setAttribute('fill','var(--sublabel)');
+  sub.setAttribute('pointer-events','none');
+  sub.setAttribute('font-style','italic');
+  sub.textContent = def.sub;
+  g.appendChild(sub);
+
+  // resize handle
+  const rh = document.createElementNS('http://www.w3.org/2000/svg','rect');
+  rh.setAttribute('x', b.x+b.w-8); rh.setAttribute('y', b.y+b.h-8);
+  rh.setAttribute('width',8); rh.setAttribute('height',8);
+  rh.setAttribute('fill','var(--accent)'); rh.setAttribute('opacity','0.6');
+  rh.setAttribute('cursor','se-resize');
+  rh.setAttribute('rx','1');
+  rh.dataset.resize = b.uid;
+  g.appendChild(rh);
+
+  // wire port dots
+  [[b.x+b.w/2, b.y],[b.x+b.w/2,b.y+b.h],[b.x,b.y+b.h/2],[b.x+b.w,b.y+b.h/2]].forEach(([px,py]) => {
+    const port = document.createElementNS('http://www.w3.org/2000/svg','circle');
+    port.setAttribute('cx',px); port.setAttribute('cy',py);
+    port.setAttribute('r',3); port.setAttribute('fill','var(--accent)');
+    port.setAttribute('opacity','0'); port.setAttribute('cursor','crosshair');
+    port.setAttribute('class','wire-port');
+    port.dataset.blockUid = b.uid;
+    g.appendChild(port);
+  });
+
+  g.addEventListener('mousedown', onBlockMousedown);
+  g.addEventListener('touchstart', onBlockTouchstart, {passive:false});
+  blocksLayer.appendChild(g);
+  b.el = g;
+
+  // show ports on hover if in wire mode
+  g.addEventListener('mouseenter', () => {
+    if (mode==='wire') g.querySelectorAll('.wire-port').forEach(p=>p.setAttribute('opacity','0.8'));
+  });
+  g.addEventListener('mouseleave', () => {
+    g.querySelectorAll('.wire-port').forEach(p=>p.setAttribute('opacity','0'));
+  });
+}
+
+function refreshBlock(b) {
+  if (b.el) b.el.remove();
+  renderBlock(b);
+  // reselect visually
+  if (selectedBlock && selectedBlock.uid === b.uid) {
+    b.el.classList.add('selected');
+  }
+  // update wires that connect to this block
+  wires.forEach(w => {
+    if (w.fromUid===b.uid || w.toUid===b.uid) renderWire(w);
+  });
+}
+
+// ══════════════════════════════════════════════════════
+// WIRE RENDERING
+// ══════════════════════════════════════════════════════
+function blockCenter(uid) {
+  const b = blocks.find(x=>x.uid===uid);
+  if (!b) return {x:0,y:0};
+  return {x: b.x+b.w/2, y: b.y+b.h/2};
+}
+
+function renderWire(w) {
+  if (w.el) w.el.remove();
+  const a = blockCenter(w.fromUid);
+  const b2 = blockCenter(w.toUid);
+  const path = document.createElementNS('http://www.w3.org/2000/svg','path');
+  // orthogonal routing
+  const mx = (a.x+b2.x)/2;
+  const d = `M ${a.x} ${a.y} L ${mx} ${a.y} L ${mx} ${b2.y} L ${b2.x} ${b2.y}`;
+  path.setAttribute('d', d);
+  path.setAttribute('class','wire-path wire-animated');
+  path.setAttribute('stroke-dasharray','6,3');
+  path.setAttribute('marker-end', dark ? 'url(#arr-fwd-d)' : 'url(#arr-fwd)');
+  path.dataset.wireUid = w.uid;
+  path.addEventListener('click', () => {
+    if (mode==='select') {
+      if (confirm('Delete this wire?')) {
+        path.remove();
+        wires = wires.filter(x=>x.uid!==w.uid);
+        updateStatus();
+      }
+    }
+  });
+  wiresLayer.appendChild(path);
+  w.el = path;
+}
+
+// ══════════════════════════════════════════════════════
+// CALLOUT RENDERING
+// ══════════════════════════════════════════════════════
+function renderCallout(c) {
+  if (c.el) c.el.remove();
+  const g = document.createElementNS('http://www.w3.org/2000/svg','g');
+  const line = document.createElementNS('http://www.w3.org/2000/svg','line');
+  line.setAttribute('x1',c.x); line.setAttribute('y1',c.y);
+  line.setAttribute('x2',c.lx); line.setAttribute('y2',c.ly);
+  line.setAttribute('stroke','var(--ink)'); line.setAttribute('stroke-width','0.7');
+  g.appendChild(line);
+  const dot = document.createElementNS('http://www.w3.org/2000/svg','circle');
+  dot.setAttribute('cx',c.x); dot.setAttribute('cy',c.y);
+  dot.setAttribute('r','2.5'); dot.setAttribute('fill','var(--ink)');
+  g.appendChild(dot);
+  const num = document.createElementNS('http://www.w3.org/2000/svg','text');
+  const side = c.lx >= c.x ? 1 : -1;
+  num.setAttribute('x', c.lx + side*5);
+  num.setAttribute('y', c.ly);
+  num.setAttribute('text-anchor', side>0 ? 'start' : 'end');
+  num.setAttribute('dominant-baseline','middle');
+  num.setAttribute('font-family','Courier Prime, monospace');
+  num.setAttribute('font-size','13');
+  num.setAttribute('font-weight','700');
+  num.setAttribute('fill','var(--label)');
+  num.setAttribute('class','callout-num');
+  num.textContent = c.num;
+  g.appendChild(num);
+  g.dataset.calloutUid = c.uid;
+  g.addEventListener('click', ()=>{
+    if (mode==='select') {
+      if (confirm('Delete callout?')) { g.remove(); callouts=callouts.filter(x=>x.uid!==c.uid); }
+    }
+  });
+  calloutsLayer.appendChild(g);
+  c.el = g;
+}
+
+// ══════════════════════════════════════════════════════
+// INSPECTOR
+// ══════════════════════════════════════════════════════
+function showInspector(b) {
+  selectedBlock = b;
+  const def = BLOCK_MAP[b.defId];
+  document.getElementById('ins-title').textContent = def.label;
+  const rows = document.getElementById('ins-rows');
+  rows.innerHTML = '';
+  Object.entries(def.specs).forEach(([k,v]) => {
+    rows.innerHTML += `<div class="ins-row"><span class="ins-key">${k}</span><span class="ins-val">${v}</span></div>`;
+  });
+  inspector.style.display = 'block';
+}
+function hideInspector() {
+  if (selectedBlock) {
+    selectedBlock.el.classList.remove('selected');
+    selectedBlock = null;
+  }
+  inspector.style.display = 'none';
+}
+
+document.getElementById('ins-delete').onclick = () => {
+  if (!selectedBlock) return;
+  selectedBlock.el.remove();
+  wires = wires.filter(w => {
+    if (w.fromUid===selectedBlock.uid || w.toUid===selectedBlock.uid) { if(w.el) w.el.remove(); return false; }
+    return true;
+  });
+  blocks = blocks.filter(b => b.uid !== selectedBlock.uid);
+  hideInspector();
+  updateStatus();
+};
+
+// ══════════════════════════════════════════════════════
+// INTERACTION — BLOCK DRAG
+// ══════════════════════════════════════════════════════
+let draggingBlock = null;
+let resizingBlock = null;
+let resizeStart = null;
+
+function onBlockMousedown(e) {
+  if (mode !== 'select') return;
+  e.preventDefault(); e.stopPropagation();
+
+  // check resize
+  const resizeUid = e.target.dataset && e.target.dataset.resize;
+  if (resizeUid) {
+    resizingBlock = blocks.find(b=>b.uid===resizeUid);
+    resizeStart = { mx: e.clientX, my: e.clientY, w: resizingBlock.w, h: resizingBlock.h };
+    return;
+  }
+  // check wire port
+  if (e.target.classList && e.target.classList.contains('wire-port')) return;
+
+  const uid = e.currentTarget.dataset.uid;
+  const b = blocks.find(x=>x.uid===uid);
+  if (!b) return;
+
+  // select
+  if (selectedBlock) selectedBlock.el.classList.remove('selected');
+  b.el.classList.add('selected');
+  showInspector(b);
+
+  const pt = getCanvasPoint(e.clientX, e.clientY);
+  draggingBlock = b;
+  dragOffset = { x: pt.x - b.x, y: pt.y - b.y };
+  isDraggingBlock = true;
+}
+
+function onBlockTouchstart(e) {
+  if (mode !== 'select') return;
+  e.preventDefault(); e.stopPropagation();
+  const t = e.touches[0];
+  const uid = e.currentTarget.dataset.uid;
+  const b = blocks.find(x=>x.uid===uid);
+  if (!b) return;
+  if (selectedBlock) selectedBlock.el.classList.remove('selected');
+  b.el.classList.add('selected');
+  showInspector(b);
+  const pt = getCanvasPoint(t.clientX, t.clientY);
+  draggingBlock = b;
+  dragOffset = { x: pt.x - b.x, y: pt.y - b.y };
+  isDraggingBlock = true;
+}
+
+// ══════════════════════════════════════════════════════
+// INTERACTION — CANVAS EVENTS
+// ══════════════════════════════════════════════════════
+let canvasPanStart = null;
+
+svg.addEventListener('mousedown', e => {
+  if (e.target === svg || e.target.id === 'svg-canvas') {
+    if (mode === 'select') {
+      // start pan
+      isPanning = true;
+      canvasPanStart = { x: e.clientX - panX, y: e.clientY - panY };
+      hideInspector();
+    } else if (mode === 'callout') {
+      const pt = getCanvasPoint(e.clientX, e.clientY);
+      if (calloutPhase === 0) {
+        pendingCallout = {x: pt.x, y: pt.y};
+        calloutPhase = 1;
+        wireHint.textContent = 'NOW CLICK TO PLACE THE LABEL NUMBER';
+      } else {
+        const c = { uid: uid(), num: calloutCounter++, x: pendingCallout.x, y: pendingCallout.y, lx: pt.x, ly: pt.y };
+        callouts.push(c);
+        renderCallout(c);
+        calloutPhase = 0; pendingCallout = null;
+        wireHint.textContent = 'CLICK ANYWHERE TO START CALLOUT';
+      }
+    }
+  }
+});
+
+svg.addEventListener('mousemove', e => {
+  if (isPanning && canvasPanStart) {
+    panX = e.clientX - canvasPanStart.x;
+    panY = e.clientY - canvasPanStart.y;
+    applyTransform();
+    return;
+  }
+  if (isDraggingBlock && draggingBlock) {
+    const pt = getCanvasPoint(e.clientX, e.clientY);
+    draggingBlock.x = snap(pt.x - dragOffset.x);
+    draggingBlock.y = snap(pt.y - dragOffset.y);
+    refreshBlock(draggingBlock);
+    return;
+  }
+  if (resizingBlock && resizeStart) {
+    const dx = (e.clientX - resizeStart.mx) / zoom;
+    const dy = (e.clientY - resizeStart.my) / zoom;
+    resizingBlock.w = Math.max(80, snap(resizeStart.w + dx));
+    resizingBlock.h = Math.max(40, snap(resizeStart.h + dy));
+    refreshBlock(resizingBlock);
+    return;
+  }
+  // wire preview line
+  if (mode === 'wire' && wireFromUid) {
+    const c = blockCenter(wireFromUid);
+    const pt = getCanvasPoint(e.clientX, e.clientY);
+    const pl = document.getElementById('wire-preview-line');
+    pl.setAttribute('x1', c.x + panX/zoom); pl.setAttribute('y1', c.y + panY/zoom);
+    pl.setAttribute('x2', pt.x + panX/zoom); pl.setAttribute('y2', pt.y + panY/zoom);
+  }
+});
+
+document.addEventListener('mouseup', () => {
+  isDraggingBlock = false; draggingBlock = null;
+  resizingBlock = null; resizeStart = null;
+  isPanning = false; canvasPanStart = null;
+});
+
+// Touch pan
+svg.addEventListener('touchstart', e => {
+  if (e.touches.length === 1 && !isDraggingBlock) {
+    const t = e.touches[0];
+    if (e.target === svg || e.target.id === 'svg-canvas') {
+      isPanning = true;
+      canvasPanStart = { x: t.clientX - panX, y: t.clientY - panY };
+    }
+  }
+}, {passive:true});
+svg.addEventListener('touchmove', e => {
+  if (e.touches.length === 1) {
+    const t = e.touches[0];
+    if (isPanning && canvasPanStart) {
+      panX = t.clientX - canvasPanStart.x;
+      panY = t.clientY - canvasPanStart.y;
+      applyTransform();
+    }
+    if (isDraggingBlock && draggingBlock) {
+      const pt = getCanvasPoint(t.clientX, t.clientY);
+      draggingBlock.x = snap(pt.x - dragOffset.x);
+      draggingBlock.y = snap(pt.y - dragOffset.y);
+      refreshBlock(draggingBlock);
+    }
+  }
+}, {passive:true});
+svg.addEventListener('touchend', () => {
+  isDraggingBlock = false; draggingBlock = null;
+  isPanning = false; canvasPanStart = null;
+});
+
+// ── WIRE MODE CLICKS ──
+svg.addEventListener('click', e => {
+  if (mode !== 'wire') return;
+  const blockEl = e.target.closest('.chip-block');
+  if (!blockEl) return;
+  const uid2 = blockEl.dataset.uid;
+  if (!wireFromUid) {
+    wireFromUid = uid2;
+    blockEl.classList.add('selected');
+    document.getElementById('wire-preview-line').style.display = 'block';
+    wireHint.textContent = 'CLICK TARGET BLOCK TO CONNECT';
+  } else if (wireFromUid !== uid2) {
+    const w = { uid: uid(), fromUid: wireFromUid, toUid: uid2 };
+    wires.push(w);
+    renderWire(w);
+    blocks.find(b=>b.uid===wireFromUid)?.el.classList.remove('selected');
+    wireFromUid = null;
+    document.getElementById('wire-preview-line').style.display = 'none';
+    wireHint.textContent = 'CLICK BLOCK TO START WIRE · CLICK ANOTHER TO CONNECT';
+    updateStatus();
+  }
+});
+
+// ── DRAG FROM SIDEBAR ──
+const canvasWrap = document.getElementById('canvas-wrap');
+canvasWrap.addEventListener('dragover', e => e.preventDefault());
+canvasWrap.addEventListener('drop', e => {
+  e.preventDefault();
+  const defId = e.dataTransfer.getData('defId');
+  if (!defId) return;
+  const def = BLOCK_MAP[defId];
+  const pt = getCanvasPoint(e.clientX, e.clientY);
+  const b = { uid: uid(), defId, x: snap(pt.x - def.w/2), y: snap(pt.y - def.h/2), w: def.w, h: def.h };
+  blocks.push(b);
+  renderBlock(b);
+  updateStatus();
+});
+
+// ── TOUCH DRAG FROM SIDEBAR (mobile) ──
+let touchDragDefId = null;
+let touchDragGhost = null;
+function onSidebarTouchStart(e) {
+  touchDragDefId = e.currentTarget.dataset.defId;
+  const t = e.touches[0];
+  touchDragGhost = document.createElement('div');
+  touchDragGhost.style.cssText = `position:fixed;pointer-events:none;z-index:9998;background:var(--paper2);border:1px solid var(--border);padding:4px 8px;font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--accent);opacity:0.8;letter-spacing:1px;`;
+  touchDragGhost.textContent = BLOCK_MAP[touchDragDefId].label;
+  document.body.appendChild(touchDragGhost);
+}
+document.addEventListener('touchmove', e => {
+  if (!touchDragDefId) return;
+  const t = e.touches[0];
+  if (touchDragGhost) {
+    touchDragGhost.style.left = (t.clientX+10)+'px';
+    touchDragGhost.style.top = (t.clientY-20)+'px';
+  }
+},{passive:true});
+document.addEventListener('touchend', e => {
+  if (!touchDragDefId) return;
+  const t = e.changedTouches[0];
+  if (touchDragGhost) { touchDragGhost.remove(); touchDragGhost=null; }
+  const rect = svg.getBoundingClientRect();
+  if (t.clientX >= rect.left && t.clientX <= rect.right && t.clientY >= rect.top && t.clientY <= rect.bottom) {
+    const def = BLOCK_MAP[touchDragDefId];
+    const pt = getCanvasPoint(t.clientX, t.clientY);
+    const b = { uid: uid(), defId: touchDragDefId, x: snap(pt.x-def.w/2), y: snap(pt.y-def.h/2), w:def.w, h:def.h };
+    blocks.push(b); renderBlock(b); updateStatus();
+  }
+  touchDragDefId = null;
+});
+
+// ══════════════════════════════════════════════════════
+// TOOLBAR BUTTONS
+// ══════════════════════════════════════════════════════
+function setMode(m) {
+  mode = m;
+  wireFromUid = null;
+  calloutPhase = 0; pendingCallout = null;
+  document.getElementById('wire-preview-line').style.display = 'none';
+  ['btn-select','btn-wire','btn-callout'].forEach(id=>document.getElementById(id).classList.remove('active'));
+  if (m==='select') { document.getElementById('btn-select').classList.add('active'); wireHint.style.display='none'; }
+  if (m==='wire')   { document.getElementById('btn-wire').classList.add('active'); wireHint.style.display='block'; wireHint.textContent='CLICK BLOCK TO START WIRE · CLICK ANOTHER TO CONNECT'; }
+  if (m==='callout'){ document.getElementById('btn-callout').classList.add('active'); wireHint.style.display='block'; wireHint.textContent='CLICK ANYWHERE TO START CALLOUT'; }
+}
+
+document.getElementById('btn-select').onclick  = () => setMode('select');
+document.getElementById('btn-wire').onclick    = () => setMode('wire');
+document.getElementById('btn-callout').onclick = () => setMode('callout');
+
+document.getElementById('btn-zoomin').onclick  = () => { zoom = Math.min(zoom*1.25, 4); applyTransform(); };
+document.getElementById('btn-zoomout').onclick = () => { zoom = Math.max(zoom/1.25, 0.2); applyTransform(); };
+document.getElementById('btn-fit').onclick     = () => { zoom=1; panX=0; panY=0; applyTransform(); };
+
+// mousewheel zoom
+canvasWrap.addEventListener('wheel', e => {
+  e.preventDefault();
+  const factor = e.deltaY < 0 ? 1.1 : 0.9;
+  zoom = Math.min(4, Math.max(0.2, zoom * factor));
+  applyTransform();
+}, {passive:false});
+
+document.getElementById('btn-clearall').onclick = () => {
+  if (!confirm('Clear everything?')) return;
+  blocks=[]; wires=[]; callouts=[]; calloutCounter=1;
+  blocksLayer.innerHTML=''; wiresLayer.innerHTML=''; calloutsLayer.innerHTML='';
+  hideInspector(); updateStatus();
+};
+
+// THEME
+document.getElementById('btn-theme').onclick = () => {
+  const f = document.getElementById('tflash');
+  f.classList.add('on');
+  setTimeout(()=>f.classList.remove('on'),120);
+  setTimeout(()=>{
+    dark = !dark;
+    document.body.setAttribute('data-theme', dark?'dark':'');
+    document.getElementById('btn-theme').textContent = dark ? '○ Light' : '◐ Dark';
+  }, 60);
+};
+
+// EXPORT
+document.getElementById('btn-export').onclick = () => {
+  const clone = svg.cloneNode(true);
+  const rect = svg.getBoundingClientRect();
+  clone.setAttribute('xmlns','http://www.w3.org/2000/svg');
+  clone.setAttribute('width', rect.width); clone.setAttribute('height', rect.height);
+  // embed fonts
+  const style = document.createElementNS('http://www.w3.org/2000/svg','style');
+  style.textContent = `@import url('https://fonts.googleapis.com/css2?family=Special+Elite&family=Share+Tech+Mono&family=Courier+Prime:ital,wght@0,400;0,700;1,400&display=swap');`;
+  clone.insertBefore(style, clone.firstChild);
+  const blob = new Blob([clone.outerHTML],{type:'image/svg+xml'});
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download='chip-design.svg'; a.click();
+};
+
+// keyboard shortcuts
+document.addEventListener('keydown', e => {
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+  if (e.key==='s'||e.key==='S') setMode('select');
+  if (e.key==='w'||e.key==='W') setMode('wire');
+  if (e.key==='c'||e.key==='C') setMode('callout');
+  if (e.key==='+'||e.key==='=') { zoom=Math.min(zoom*1.2,4); applyTransform(); }
+  if (e.key==='-') { zoom=Math.max(zoom/1.2,0.2); applyTransform(); }
+  if (e.key==='f'||e.key==='F') { zoom=1;panX=0;panY=0;applyTransform(); }
+  if ((e.key==='Delete'||e.key==='Backspace') && selectedBlock) document.getElementById('ins-delete').click();
+  if (e.key==='Escape') { setMode('select'); hideInspector(); }
+});
+
+// ══════════════════════════════════════════════════════
+// UTILS
+// ══════════════════════════════════════════════════════
+let _uid = 1;
+function uid() { return 'b' + (_uid++); }
+
+function updateStatus() {
+  statusBar.textContent = `BLOCKS: ${blocks.length} · WIRES: ${wires.length} · MODE: ${mode.toUpperCase()}`;
+}
+updateStatus();
+applyTransform();
+</script>
+</body>
+</html>
