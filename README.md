@@ -50,7 +50,7 @@ Chip is developed with a multi-agent workflow. Human contributions remain the so
       <sub>LLM Support</sub>
     </td>
     <td align="center" width="120">
-      <div style="font-size:40px;line-height:40px;font-weight:700;">Y</div>
+      <img src="https://github.com/Yuri-code-dot.png?size=80" width="40" height="40" alt="Yuri"/><br/>
       <b>Yuri</b><br/>
       <sub>Owner · Final say</sub>
     </td>
