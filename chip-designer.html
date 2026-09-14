@@ -3,161 +3,224 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Silicon Canvas — Chip Designer</title>
+<title>Silicon Canvas — Chip Designer 2.0</title>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Special+Elite&family=Share+Tech+Mono&family=Courier+Prime:ital,wght@0,400;0,700;1,400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&family=Special+Elite&display=swap');
 
 :root {
-  --paper: #f3eeff;
-  --paper2: #e8ddf7;
-  --paper3: #ddd0f5;
+  --bg: #f5f2fa;
+  --paper: #ffffff;
+  --paper2: #f0eaf8;
+  --paper3: #e5daf3;
+  --glass-bg: rgba(255, 255, 255, 0.82);
+  --glass-border: rgba(124, 58, 237, 0.22);
   --ink: #1a0a2e;
   --ink2: #3d2068;
   --accent: #7c3aed;
+  --accent-hover: #6d28d9;
   --accent2: #a855f7;
   --accent3: #c084fc;
   --trace: #6d28d9;
-  --faint: rgba(124,58,237,0.07);
-  --faint2: rgba(124,58,237,0.13);
-  --grid: rgba(124,58,237,0.08);
-  --shadow: rgba(109,40,217,0.2);
+  --faint: rgba(124, 58, 237, 0.06);
+  --faint2: rgba(124, 58, 237, 0.12);
+  --grid: rgba(124, 58, 237, 0.08);
+  --shadow: rgba(109, 40, 217, 0.15);
+  --shadow-lg: 0 10px 25px -5px rgba(109, 40, 217, 0.2), 0 8px 10px -6px rgba(109, 40, 217, 0.1);
   --border: #7c3aed;
+  --border-muted: #d8c7f8;
   --block-stroke: #3d2068;
   --label: #1a0a2e;
   --sublabel: #5b21b6;
-  --sidebar-bg: #f0e8ff;
-  --sidebar-border: #c4b5fd;
-  --toolbar-bg: #ede0ff;
-  --bg: #f8f4ff;
+  --sidebar-bg: #f9f6fd;
+  --sidebar-border: #dcd0f5;
+  --toolbar-bg: rgba(255, 255, 255, 0.88);
+  --wire-data: #6d28d9;
+  --wire-power: #dc2626;
+  --wire-clock: #0284c7;
+  --wire-control: #d97706;
   --wire-color: #6d28d9;
   --wire-hover: #a855f7;
   --selected: #7c3aed;
   --delete-red: #dc2626;
+  --success: #10b981;
 }
+
 [data-theme="dark"] {
+  --bg: #090412;
   --paper: #0d0618;
-  --paper2: #130824;
-  --paper3: #1a0d2e;
-  --ink: #e8d5ff;
+  --paper2: #140a26;
+  --paper3: #1d0f36;
+  --glass-bg: rgba(13, 6, 24, 0.85);
+  --glass-border: rgba(168, 85, 247, 0.28);
+  --ink: #f0e6ff;
   --ink2: #c4b5fd;
   --accent: #a855f7;
+  --accent-hover: #c084fc;
   --accent2: #7c3aed;
   --accent3: #6d28d9;
   --trace: #c084fc;
-  --faint: rgba(168,85,247,0.05);
-  --faint2: rgba(168,85,247,0.1);
-  --grid: rgba(168,85,247,0.08);
-  --shadow: rgba(168,85,247,0.3);
-  --border: #7c3aed;
+  --faint: rgba(168, 85, 247, 0.08);
+  --faint2: rgba(168, 85, 247, 0.16);
+  --grid: rgba(168, 85, 247, 0.09);
+  --shadow: rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 10px 30px -5px rgba(0, 0, 0, 0.7), 0 0 15px rgba(168, 85, 247, 0.2);
+  --border: #a855f7;
+  --border-muted: #381a60;
   --block-stroke: #c084fc;
-  --label: #e8d5ff;
+  --label: #f0e6ff;
   --sublabel: #a78bfa;
-  --sidebar-bg: #0d0618;
-  --sidebar-border: #3d2068;
-  --toolbar-bg: #130824;
-  --bg: #080412;
+  --sidebar-bg: #0c0516;
+  --sidebar-border: #2c144c;
+  --toolbar-bg: rgba(13, 6, 24, 0.88);
+  --wire-data: #c084fc;
+  --wire-power: #f87171;
+  --wire-clock: #38bdf8;
+  --wire-control: #fbbf24;
   --wire-color: #c084fc;
   --wire-hover: #e879f9;
   --selected: #c084fc;
   --delete-red: #f87171;
+  --success: #34d399;
 }
 
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
-html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-family:'Courier Prime',monospace;transition:background 0.6s,color 0.6s;}
+html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-family:'Inter',-apple-system,sans-serif;color:var(--ink);transition:background 0.4s,color 0.4s;}
 
 /* ── LAYOUT ── */
-#app{display:flex;flex-direction:column;height:100vh;width:100vw;}
+#app{display:flex;flex-direction:column;height:100vh;width:100vw;position:relative;}
 
 /* ── TOOLBAR ── */
 #toolbar{
-  display:flex;align-items:center;gap:6px;padding:7px 10px;
-  background:var(--toolbar-bg);border-bottom:1.5px solid var(--border);
+  display:flex;align-items:center;gap:8px;padding:8px 14px;
+  background:var(--toolbar-bg);
+  backdrop-filter:blur(12px);
+  -webkit-backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--glass-border);
   flex-shrink:0;overflow-x:auto;scrollbar-width:none;
-  transition:background 0.6s,border-color 0.6s;
-  z-index:100;
+  z-index:100;box-shadow:var(--shadow-lg);
+  transition:all 0.4s;
 }
 #toolbar::-webkit-scrollbar{display:none;}
 
+.tb-brand{
+  display:flex;align-items:center;gap:8px;margin-right:8px;
+}
 .tb-title{
-  font-family:'Special Elite',cursive;font-size:13px;letter-spacing:3px;
-  color:var(--accent);white-space:nowrap;margin-right:6px;
-  transition:color 0.6s;
+  font-family:'Special Elite',cursive;font-size:15px;letter-spacing:2px;
+  color:var(--accent);white-space:nowrap;font-weight:bold;
+  text-shadow:0 0 10px var(--faint2);
+}
+.tb-badge{
+  font-family:'Fira Code',monospace;font-size:9px;padding:2px 6px;
+  border-radius:4px;background:var(--faint2);color:var(--accent);
+  border:1px solid var(--glass-border);font-weight:600;
+}
+
+.tb-group{
+  display:flex;align-items:center;gap:4px;background:var(--faint);
+  padding:3px;border-radius:6px;border:1px solid var(--border-muted);
 }
 
 .tb-btn{
-  font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:1px;
-  padding:5px 10px;border:1px solid var(--border);background:transparent;
-  color:var(--accent);cursor:pointer;text-transform:uppercase;white-space:nowrap;
-  transition:all 0.2s;border-radius:1px;
+  font-family:'Fira Code',monospace;font-size:10px;font-weight:500;
+  padding:6px 10px;border:1px solid transparent;background:transparent;
+  color:var(--ink);cursor:pointer;white-space:nowrap;
+  border-radius:4px;display:flex;align-items:center;gap:5px;
+  transition:all 0.15s ease;user-select:none;
 }
-.tb-btn:hover{background:var(--faint2);}
-.tb-btn.active{background:var(--accent);color:var(--paper);border-color:var(--accent);}
-.tb-btn.danger{border-color:var(--delete-red);color:var(--delete-red);}
-.tb-btn.danger:hover{background:var(--delete-red);color:#fff;}
+.tb-btn:hover{background:var(--faint2);color:var(--accent);border-color:var(--glass-border);}
+.tb-btn.active{background:var(--accent);color:#fff!important;border-color:var(--accent);box-shadow:0 2px 8px var(--shadow);}
+.tb-btn.danger:hover{background:var(--delete-red);color:#fff!important;border-color:var(--delete-red);}
+.tb-btn:disabled{opacity:0.4;cursor:not-allowed;border-color:transparent!important;background:transparent!important;}
 
-.tb-sep{width:1px;height:24px;background:var(--border);opacity:0.3;flex-shrink:0;}
+.tb-select{
+  font-family:'Fira Code',monospace;font-size:10px;padding:5px 8px;
+  border-radius:4px;border:1px solid var(--border-muted);background:var(--paper);
+  color:var(--ink);outline:none;cursor:pointer;
+}
+.tb-select:focus{border-color:var(--accent);}
+
+.tb-sep{width:1px;height:22px;background:var(--border-muted);margin:0 2px;flex-shrink:0;}
 
 #status-bar{
-  font-family:'Share Tech Mono',monospace;font-size:8px;letter-spacing:1px;
+  font-family:'Fira Code',monospace;font-size:9px;
   color:var(--sublabel);white-space:nowrap;margin-left:auto;
-  transition:color 0.6s;
+  display:flex;align-items:center;gap:12px;padding-left:10px;
+}
+.status-tag{
+  padding:2px 6px;border-radius:3px;background:var(--paper2);
+  border:1px solid var(--border-muted);font-weight:600;
 }
 
-/* ── MAIN ── */
-#main{display:flex;flex:1;overflow:hidden;}
+/* ── MAIN AREA ── */
+#main{display:flex;flex:1;overflow:hidden;position:relative;}
 
 /* ── SIDEBAR ── */
 #sidebar{
-  width:160px;flex-shrink:0;background:var(--sidebar-bg);
-  border-right:1.5px solid var(--sidebar-border);
+  width:210px;flex-shrink:0;background:var(--sidebar-bg);
+  border-right:1px solid var(--sidebar-border);
   display:flex;flex-direction:column;overflow:hidden;
-  transition:background 0.6s,border-color 0.6s;
-  z-index:50;
+  z-index:50;transition:all 0.4s;
 }
 .sidebar-header{
-  padding:8px 10px;border-bottom:1px solid var(--sidebar-border);
-  font-family:'Share Tech Mono',monospace;font-size:8px;letter-spacing:2px;
-  color:var(--accent);text-transform:uppercase;
-  transition:color 0.6s,border-color 0.6s;
+  padding:10px 12px;border-bottom:1px solid var(--sidebar-border);
+  font-family:'Fira Code',monospace;font-size:10px;font-weight:700;
+  letter-spacing:1px;color:var(--accent);text-transform:uppercase;
+  display:flex;align-items:center;justify-content:space-between;
+  background:var(--paper2);
 }
-#block-list{flex:1;overflow-y:auto;padding:4px;scrollbar-width:thin;scrollbar-color:var(--accent) transparent;}
-#block-list::-webkit-scrollbar{width:3px;}
-#block-list::-webkit-scrollbar-thumb{background:var(--accent);opacity:0.4;}
+.sidebar-search{
+  padding:6px 8px;border-bottom:1px solid var(--sidebar-border);background:var(--paper);
+}
+.sidebar-search input{
+  width:100%;font-family:'Inter',sans-serif;font-size:11px;padding:5px 8px;
+  border:1px solid var(--border-muted);border-radius:4px;background:var(--bg);
+  color:var(--ink);outline:none;
+}
+.sidebar-search input:focus{border-color:var(--accent);}
+
+#block-list{flex:1;overflow-y:auto;padding:6px;scrollbar-width:thin;scrollbar-color:var(--accent) transparent;}
+#block-list::-webkit-scrollbar{width:4px;}
+#block-list::-webkit-scrollbar-thumb{background:var(--border-muted);border-radius:2px;}
 
 .block-category{
-  font-family:'Share Tech Mono',monospace;font-size:7px;letter-spacing:2px;
-  color:var(--accent);text-transform:uppercase;padding:6px 4px 3px;
-  border-bottom:1px solid var(--sidebar-border);margin-bottom:2px;
-  transition:color 0.6s;
+  font-family:'Fira Code',monospace;font-size:9px;font-weight:700;
+  letter-spacing:1px;color:var(--accent);text-transform:uppercase;
+  padding:8px 6px 4px;margin-top:4px;
+  border-bottom:1px dashed var(--sidebar-border);
 }
 
 .block-item{
-  display:flex;align-items:center;gap:6px;padding:5px 6px;
-  cursor:grab;border:1px solid transparent;border-radius:1px;
-  transition:all 0.15s;margin-bottom:1px;
-  user-select:none;
+  display:flex;align-items:center;gap:8px;padding:7px 8px;
+  cursor:grab;border:1px solid transparent;border-radius:6px;
+  transition:all 0.15s;margin-bottom:3px;background:var(--paper);
+  box-shadow:0 1px 3px rgba(0,0,0,0.03);user-select:none;
 }
-.block-item:hover{border-color:var(--border);background:var(--faint2);}
+.block-item:hover{border-color:var(--accent);background:var(--paper2);transform:translateX(2px);}
 .block-item:active{cursor:grabbing;}
 
 .bi-swatch{
-  width:12px;height:12px;border:1px solid var(--block-stroke);flex-shrink:0;
-  transition:border-color 0.6s;
+  width:14px;height:14px;border:1px solid var(--block-stroke);flex-shrink:0;
+  border-radius:3px;
 }
+.bi-info{display:flex;flex-direction:column;overflow:hidden;}
 .bi-label{
-  font-family:'Share Tech Mono',monospace;font-size:8px;
-  color:var(--label);letter-spacing:0.5px;line-height:1.2;
-  transition:color 0.6s;
+  font-family:'Fira Code',monospace;font-size:10px;font-weight:600;
+  color:var(--label);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.bi-sub{
+  font-family:'Inter',sans-serif;font-size:8px;color:var(--sublabel);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
 }
 
 /* ── CANVAS AREA ── */
-#canvas-wrap{flex:1;position:relative;overflow:hidden;background:var(--paper);transition:background 0.6s;}
+#canvas-wrap{flex:1;position:relative;overflow:hidden;background:var(--paper);transition:background 0.4s;}
 
-/* grid */
+/* Blueprint / Grid Overlay */
 #canvas-wrap::before{
   content:'';position:absolute;inset:0;
   background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
-  background-size:24px 24px;pointer-events:none;z-index:0;transition:background-size 0.3s;
+  background-size:24px 24px;pointer-events:none;z-index:0;
 }
 
 #svg-canvas{
@@ -166,151 +229,303 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-famil
 }
 
 /* ── BLOCK STYLES ── */
-.chip-block{cursor:move;}
-.chip-block:hover .block-rect{filter:brightness(0.97);}
-.chip-block.selected .block-rect{stroke:var(--selected)!important;stroke-width:2!important;}
-.chip-block.selected .block-inner{stroke:var(--selected)!important;opacity:0.7;}
+.chip-block{cursor:move;transition:filter 0.2s;}
+.chip-block:hover .block-rect{filter:brightness(1.03);stroke:var(--accent);}
+.chip-block.selected .block-rect{stroke:var(--selected)!important;stroke-width:2.5!important;filter:drop-shadow(0 0 8px var(--accent3));}
+.chip-block.selected .block-inner{stroke:var(--selected)!important;opacity:0.8;}
 
-/* ── WIRE ── */
-.wire-path{stroke:var(--wire-color);stroke-width:1.5;fill:none;cursor:pointer;transition:stroke 0.3s;}
-.wire-path:hover{stroke:var(--wire-hover);stroke-width:2.5;}
-.wire-preview{stroke:var(--accent2);stroke-width:1.2;fill:none;stroke-dasharray:5,3;pointer-events:none;}
+/* ── WIRE STYLES ── */
+.wire-path{stroke-width:2;fill:none;cursor:pointer;transition:stroke 0.2s, stroke-width 0.2s;}
+.wire-path:hover{stroke-width:3.5!important;filter:drop-shadow(0 0 6px var(--wire-hover));}
+.wire-preview{stroke:var(--accent2);stroke-width:1.5;fill:none;stroke-dasharray:5,3;pointer-events:none;}
 
-/* ── TOOLTIP / INSPECTOR ── */
+/* ── INSPECTOR ── */
 #inspector{
-  position:absolute;right:10px;top:10px;width:190px;
-  background:var(--toolbar-bg);border:1.5px solid var(--border);
-  padding:10px;z-index:200;display:none;
-  transition:background 0.6s,border-color 0.6s;
-  box-shadow:4px 4px 0 var(--shadow);
+  position:absolute;right:16px;top:16px;width:230px;
+  background:var(--glass-bg);
+  backdrop-filter:blur(16px);
+  -webkit-backdrop-filter:blur(16px);
+  border:1px solid var(--glass-border);
+  border-radius:10px;padding:12px;z-index:200;display:none;
+  box-shadow:var(--shadow-lg);transition:all 0.3s;
+}
+#inspector .ins-title-row{
+  display:flex;align-items:center;justify-content:space-between;
+  border-bottom:1px solid var(--border-muted);padding-bottom:6px;margin-bottom:10px;
 }
 #inspector .ins-title{
-  font-family:'Special Elite',cursive;font-size:11px;color:var(--accent);
-  letter-spacing:2px;border-bottom:1px solid var(--border);padding-bottom:5px;margin-bottom:7px;
+  font-family:'Fira Code',monospace;font-size:12px;font-weight:700;
+  color:var(--accent);letter-spacing:0.5px;
 }
-.ins-row{display:flex;justify-content:space-between;margin-bottom:4px;}
-.ins-key{font-family:'Share Tech Mono',monospace;font-size:8px;color:var(--sublabel);letter-spacing:1px;}
-.ins-val{font-family:'Courier Prime',monospace;font-size:8px;font-weight:700;color:var(--label);text-align:right;max-width:110px;}
-#ins-delete{
-  margin-top:8px;width:100%;font-family:'Share Tech Mono',monospace;font-size:8px;
-  padding:4px;border:1px solid var(--delete-red);background:transparent;
-  color:var(--delete-red);cursor:pointer;letter-spacing:1px;text-transform:uppercase;
-  transition:all 0.2s;
+.ins-close{
+  border:none;background:transparent;color:var(--sublabel);
+  font-size:14px;cursor:pointer;padding:2px 6px;border-radius:4px;
 }
-#ins-delete:hover{background:var(--delete-red);color:#fff;}
+.ins-close:hover{background:var(--faint2);color:var(--ink);}
 
-/* ── WIRE PREVIEW OVERLAY ── */
+.ins-field{margin-bottom:8px;}
+.ins-field label{
+  display:block;font-family:'Fira Code',monospace;font-size:8px;
+  color:var(--sublabel);letter-spacing:0.5px;margin-bottom:2px;text-transform:uppercase;
+}
+.ins-input{
+  width:100%;font-family:'Fira Code',monospace;font-size:10px;
+  padding:5px 8px;border:1px solid var(--border-muted);border-radius:4px;
+  background:var(--paper);color:var(--ink);outline:none;
+}
+.ins-input:focus{border-color:var(--accent);}
+
+.ins-specs-title{
+  font-family:'Fira Code',monospace;font-size:9px;font-weight:700;
+  color:var(--accent);margin:10px 0 6px;text-transform:uppercase;
+  display:flex;justify-content:space-between;align-items:center;
+}
+.ins-spec-row{display:flex;gap:4px;margin-bottom:4px;align-items:center;}
+.ins-spec-k{width:45%;font-size:9px;padding:3px 5px;}
+.ins-spec-v{width:45%;font-size:9px;padding:3px 5px;}
+.ins-spec-del{
+  width:10%;border:none;background:transparent;color:var(--delete-red);
+  cursor:pointer;font-weight:bold;font-size:12px;text-align:center;
+}
+
+.ins-actions{display:flex;gap:6px;margin-top:12px;flex-wrap:wrap;}
+.ins-act-btn{
+  flex:1;min-width:70px;font-family:'Fira Code',monospace;font-size:9px;
+  padding:6px;border:1px solid var(--border-muted);background:var(--paper2);
+  color:var(--ink);border-radius:4px;cursor:pointer;text-align:center;
+  transition:all 0.15s;font-weight:600;
+}
+.ins-act-btn:hover{background:var(--faint2);border-color:var(--accent);color:var(--accent);}
+.ins-act-btn.danger{border-color:var(--delete-red);color:var(--delete-red);}
+.ins-act-btn.danger:hover{background:var(--delete-red);color:#fff;}
+
+/* ── WIRE HINT ── */
 #wire-hint{
-  position:absolute;bottom:10px;left:50%;transform:translateX(-50%);
-  background:var(--toolbar-bg);border:1px solid var(--border);
-  padding:5px 14px;font-family:'Share Tech Mono',monospace;font-size:8px;
-  color:var(--accent);letter-spacing:2px;z-index:200;pointer-events:none;
-  display:none;text-transform:uppercase;
+  position:absolute;bottom:16px;left:50%;transform:translateX(-50%);
+  background:var(--glass-bg);backdrop-filter:blur(12px);
+  border:1px solid var(--glass-border);border-radius:20px;
+  padding:6px 16px;font-family:'Fira Code',monospace;font-size:9px;
+  color:var(--accent);letter-spacing:1px;z-index:200;pointer-events:none;
+  display:none;text-transform:uppercase;box-shadow:var(--shadow-lg);
+  font-weight:600;
 }
-
-/* ── THEME FLASH ── */
-.t-flash{position:fixed;inset:0;background:var(--accent);opacity:0;pointer-events:none;z-index:9999;transition:opacity 0.12s;}
-.t-flash.on{opacity:0.07;}
 
 /* ── CORNER MARKS ── */
-.corner-mark{position:absolute;width:14px;height:14px;pointer-events:none;z-index:5;}
+.corner-mark{position:absolute;width:16px;height:16px;pointer-events:none;z-index:5;opacity:0.6;}
 .corner-mark svg{width:100%;height:100%;}
-.cm-tl{top:6px;left:6px;}
-.cm-tr{top:6px;right:6px;transform:scaleX(-1);}
-.cm-bl{bottom:6px;left:6px;transform:scaleY(-1);}
-.cm-br{bottom:6px;right:6px;transform:scale(-1,-1);}
+.cm-tl{top:8px;left:8px;}
+.cm-tr{top:8px;right:8px;transform:scaleX(-1);}
+.cm-bl{bottom:8px;left:8px;transform:scaleY(-1);}
+.cm-br{bottom:8px;right:8px;transform:scale(-1,-1);}
 
 /* animations */
-@keyframes dashFlow{to{stroke-dashoffset:-16;}}
-.wire-animated{animation:dashFlow 1.6s linear infinite;}
+@keyframes dashFlow{to{stroke-dashoffset:-20;}}
+.wire-animated{animation:dashFlow 1.4s linear infinite;}
 @keyframes blockIn{from{opacity:0;transform:scale(0.92);}to{opacity:1;transform:scale(1);}}
-.block-appear{animation:blockIn 0.2s ease both;}
+.block-appear{animation:blockIn 0.2s cubic-bezier(0.16, 1, 0.3, 1) both;}
 
 /* callout number bubbles */
 .callout-num{
-  font-family:'Courier Prime',monospace;font-size:10px;font-weight:700;
+  font-family:'Fira Code',monospace;font-size:12px;font-weight:700;
   fill:var(--label);pointer-events:none;
+}
+
+/* ── MODAL DIALOGS ── */
+.modal-overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,0.45);
+  backdrop-filter:blur(4px);
+  z-index:9900;display:none;align-items:center;justify-content:center;
+}
+.modal-card{
+  background:var(--paper);border:1px solid var(--glass-border);
+  border-radius:12px;width:420px;max-width:92vw;padding:20px;
+  box-shadow:var(--shadow-lg);animation:blockIn 0.25s ease;
+  max-height:88vh;overflow-y:auto;
+}
+.modal-title{
+  font-family:'Fira Code',monospace;font-size:14px;font-weight:700;
+  color:var(--accent);margin-bottom:14px;display:flex;justify-content:space-between;
+  align-items:center;border-bottom:1px solid var(--border-muted);padding-bottom:8px;
+}
+.modal-form-group{margin-bottom:12px;}
+.modal-form-group label{
+  display:block;font-family:'Fira Code',monospace;font-size:9px;
+  font-weight:600;color:var(--sublabel);margin-bottom:4px;text-transform:uppercase;
+}
+.modal-form-group input, .modal-form-group select{
+  width:100%;font-family:'Fira Code',monospace;font-size:11px;
+  padding:7px 10px;border:1px solid var(--border-muted);border-radius:6px;
+  background:var(--bg);color:var(--ink);outline:none;
+}
+.modal-form-group input:focus, .modal-form-group select:focus{border-color:var(--accent);}
+.modal-row{display:flex;gap:10px;}
+.modal-row .modal-form-group{flex:1;}
+
+.modal-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:18px;}
+.btn-primary{
+  font-family:'Fira Code',monospace;font-size:10px;font-weight:600;
+  padding:8px 16px;background:var(--accent);color:#fff;border:none;
+  border-radius:6px;cursor:pointer;transition:all 0.2s;
+}
+.btn-primary:hover{background:var(--accent-hover);box-shadow:0 2px 8px var(--shadow);}
+.btn-secondary{
+  font-family:'Fira Code',monospace;font-size:10px;font-weight:600;
+  padding:8px 16px;background:transparent;color:var(--ink);
+  border:1px solid var(--border-muted);border-radius:6px;cursor:pointer;
+}
+.btn-secondary:hover{background:var(--paper2);}
+
+/* TOAST NOTIFICATION */
+#toast{
+  position:fixed;bottom:20px;right:20px;padding:8px 16px;
+  background:var(--glass-bg);backdrop-filter:blur(10px);
+  border:1px solid var(--glass-border);border-radius:8px;
+  font-family:'Fira Code',monospace;font-size:10px;color:var(--ink);
+  box-shadow:var(--shadow-lg);z-index:9999;display:none;
+  animation:blockIn 0.2s ease;
 }
 </style>
 </head>
 <body data-theme="">
-<div class="t-flash" id="tflash"></div>
 
 <div id="app">
 
   <!-- TOOLBAR -->
   <div id="toolbar">
-    <span class="tb-title">⬡ SILICON CANVAS</span>
+    <div class="tb-brand">
+      <span class="tb-title">⬡ SILICON CANVAS</span>
+      <span class="tb-badge">v2.0</span>
+    </div>
+
     <div class="tb-sep"></div>
-    <button class="tb-btn active" id="btn-select" title="Select & Move (S)">✦ Select</button>
-    <button class="tb-btn" id="btn-wire" title="Draw Wire (W)">⟶ Wire</button>
-    <button class="tb-btn" id="btn-callout" title="Add Callout (C)">① Callout</button>
+
+    <div class="tb-group">
+      <button class="tb-btn active" id="btn-select" title="Select & Move (S)">✦ Select</button>
+      <button class="tb-btn" id="btn-wire" title="Draw Wire (W)">⟶ Wire</button>
+      <button class="tb-btn" id="btn-callout" title="Add Callout (C)">① Callout</button>
+    </div>
+
+    <!-- WIRE TYPE SELECTOR -->
+    <select class="tb-select" id="wire-type-select" title="Wire Type / Style">
+      <option value="data">⚡ Data Bus</option>
+      <option value="power">🔴 Power Rail</option>
+      <option value="clock">🔵 Clock Signal</option>
+      <option value="control">🟠 Control Line</option>
+    </select>
+
     <div class="tb-sep"></div>
-    <button class="tb-btn" id="btn-zoomin" title="Zoom In (+)">＋ Zoom</button>
-    <button class="tb-btn" id="btn-zoomout" title="Zoom Out (-)">－ Zoom</button>
-    <button class="tb-btn" id="btn-fit" title="Fit canvas (F)">⊡ Fit</button>
+
+    <!-- UNDO / REDO -->
+    <div class="tb-group">
+      <button class="tb-btn" id="btn-undo" title="Undo (Ctrl+Z)" disabled>↶ Undo</button>
+      <button class="tb-btn" id="btn-redo" title="Redo (Ctrl+Y)" disabled>↷ Redo</button>
+    </div>
+
     <div class="tb-sep"></div>
-    <button class="tb-btn" id="btn-theme">◐ Dark</button>
-    <button class="tb-btn" id="btn-export">⬇ Export SVG</button>
-    <button class="tb-btn danger" id="btn-clearall">↺ Clear</button>
+
+    <!-- CUSTOM BLOCK -->
+    <button class="tb-btn" id="btn-custom-block" title="Create Custom Silicon Block">➕ Block</button>
+
+    <!-- TEMPLATES -->
+    <select class="tb-select" id="template-select" title="Load Preset Architecture">
+      <option value="" disabled selected>⚡ Preset Templates</option>
+      <option value="mobile-soc">📱 Mobile SoC Architecture</option>
+      <option value="ai-engine">🧠 AI Accelerator & NPU Cluster</option>
+      <option value="riscv-mcu">⚙️ RISC-V Microcontroller</option>
+    </select>
+
     <div class="tb-sep"></div>
-    <span id="status-bar">BLOCKS: 0 · WIRES: 0 · DRAG FROM SIDEBAR TO PLACE</span>
+
+    <!-- ZOOM -->
+    <div class="tb-group">
+      <button class="tb-btn" id="btn-zoomin" title="Zoom In (+)">＋</button>
+      <button class="tb-btn" id="btn-zoomout" title="Zoom Out (-)">－</button>
+      <button class="tb-btn" id="btn-fit" title="Fit canvas (F)">⊡ Fit</button>
+    </div>
+
+    <div class="tb-sep"></div>
+
+    <!-- DATA & EXPORT -->
+    <button class="tb-btn" id="btn-save" title="Save Layout JSON">💾 Save</button>
+    <button class="tb-btn" id="btn-load" title="Load Layout JSON">📂 Load</button>
+    <input type="file" id="file-input" accept=".json" style="display:none">
+
+    <button class="tb-btn" id="btn-theme" title="Toggle Dark/Light Mode">◐ Theme</button>
+    <button class="tb-btn" id="btn-export" title="Export SVG">⬇ Export</button>
+    <button class="tb-btn danger" id="btn-clearall" title="Clear Canvas">↺ Clear</button>
+
+    <div id="status-bar">
+      <span class="status-tag" id="st-blocks">BLOCKS: 0</span>
+      <span class="status-tag" id="st-wires">WIRES: 0</span>
+    </div>
   </div>
 
   <div id="main">
 
     <!-- SIDEBAR -->
     <div id="sidebar">
-      <div class="sidebar-header">⬡ Block Library</div>
+      <div class="sidebar-header">
+        <span>⬡ Block Library</span>
+        <span style="font-size:8px;opacity:0.7;">35+ CORES</span>
+      </div>
+      <div class="sidebar-search">
+        <input type="text" id="sidebar-filter" placeholder="Search blocks..." autocomplete="off">
+      </div>
       <div id="block-list"></div>
     </div>
 
-    <!-- CANVAS -->
+    <!-- CANVAS AREA -->
     <div id="canvas-wrap">
-      <div class="corner-mark cm-tl"><svg viewBox="0 0 14 14"><path d="M0,14 L0,0 L14,0" fill="none" stroke="var(--border)" stroke-width="1.2"/></svg></div>
-      <div class="corner-mark cm-tr"><svg viewBox="0 0 14 14"><path d="M0,14 L0,0 L14,0" fill="none" stroke="var(--border)" stroke-width="1.2"/></svg></div>
-      <div class="corner-mark cm-bl"><svg viewBox="0 0 14 14"><path d="M0,14 L0,0 L14,0" fill="none" stroke="var(--border)" stroke-width="1.2"/></svg></div>
-      <div class="corner-mark cm-br"><svg viewBox="0 0 14 14"><path d="M0,14 L0,0 L14,0" fill="none" stroke="var(--border)" stroke-width="1.2"/></svg></div>
+      <div class="corner-mark cm-tl"><svg viewBox="0 0 14 14"><path d="M0,14 L0,0 L14,0" fill="none" stroke="var(--border)" stroke-width="1.5"/></svg></div>
+      <div class="corner-mark cm-tr"><svg viewBox="0 0 14 14"><path d="M0,14 L0,0 L14,0" fill="none" stroke="var(--border)" stroke-width="1.5"/></svg></div>
+      <div class="corner-mark cm-bl"><svg viewBox="0 0 14 14"><path d="M0,14 L0,0 L14,0" fill="none" stroke="var(--border)" stroke-width="1.5"/></svg></div>
+      <div class="corner-mark cm-br"><svg viewBox="0 0 14 14"><path d="M0,14 L0,0 L14,0" fill="none" stroke="var(--border)" stroke-width="1.5"/></svg></div>
 
       <svg id="svg-canvas" xmlns="http://www.w3.org/2000/svg">
         <defs id="svg-defs">
           <pattern id="hp-cross" patternUnits="userSpaceOnUse" width="10" height="10">
-            <line x1="0" y1="0" x2="10" y2="10" stroke="#7c3aed" stroke-width="0.4" opacity="0.3"/>
-            <line x1="10" y1="0" x2="0" y2="10" stroke="#7c3aed" stroke-width="0.4" opacity="0.3"/>
+            <line x1="0" y1="0" x2="10" y2="10" stroke="var(--accent)" stroke-width="0.4" opacity="0.3"/>
+            <line x1="10" y1="0" x2="0" y2="10" stroke="var(--accent)" stroke-width="0.4" opacity="0.3"/>
           </pattern>
           <pattern id="hp-diag" patternUnits="userSpaceOnUse" width="8" height="8">
-            <line x1="0" y1="8" x2="8" y2="0" stroke="#7c3aed" stroke-width="0.5" opacity="0.3"/>
+            <line x1="0" y1="8" x2="8" y2="0" stroke="var(--accent)" stroke-width="0.5" opacity="0.3"/>
           </pattern>
           <pattern id="hp-horiz" patternUnits="userSpaceOnUse" width="8" height="7">
-            <line x1="0" y1="3.5" x2="8" y2="3.5" stroke="#7c3aed" stroke-width="0.4" opacity="0.3"/>
+            <line x1="0" y1="3.5" x2="8" y2="3.5" stroke="var(--accent)" stroke-width="0.4" opacity="0.3"/>
           </pattern>
           <pattern id="hp-vert" patternUnits="userSpaceOnUse" width="7" height="8">
-            <line x1="3.5" y1="0" x2="3.5" y2="8" stroke="#7c3aed" stroke-width="0.4" opacity="0.3"/>
+            <line x1="3.5" y1="0" x2="3.5" y2="8" stroke="var(--accent)" stroke-width="0.4" opacity="0.3"/>
           </pattern>
           <pattern id="hp-dots" patternUnits="userSpaceOnUse" width="8" height="8">
-            <circle cx="4" cy="4" r="0.9" fill="#7c3aed" opacity="0.3"/>
+            <circle cx="4" cy="4" r="0.9" fill="var(--accent)" opacity="0.3"/>
           </pattern>
           <pattern id="hp-grid" patternUnits="userSpaceOnUse" width="7" height="7">
-            <line x1="0" y1="0" x2="7" y2="0" stroke="#7c3aed" stroke-width="0.4" opacity="0.25"/>
-            <line x1="0" y1="0" x2="0" y2="7" stroke="#7c3aed" stroke-width="0.4" opacity="0.25"/>
+            <line x1="0" y1="0" x2="7" y2="0" stroke="var(--accent)" stroke-width="0.4" opacity="0.25"/>
+            <line x1="0" y1="0" x2="0" y2="7" stroke="var(--accent)" stroke-width="0.4" opacity="0.25"/>
           </pattern>
           <pattern id="hp-wave" patternUnits="userSpaceOnUse" width="12" height="6">
-            <path d="M0,3 Q3,0 6,3 Q9,6 12,3" fill="none" stroke="#7c3aed" stroke-width="0.5" opacity="0.3"/>
+            <path d="M0,3 Q3,0 6,3 Q9,6 12,3" fill="none" stroke="var(--accent)" stroke-width="0.5" opacity="0.3"/>
           </pattern>
           <pattern id="hp-brick" patternUnits="userSpaceOnUse" width="16" height="8">
-            <rect x="0" y="0" width="16" height="4" fill="none" stroke="#7c3aed" stroke-width="0.4" opacity="0.25"/>
-            <rect x="0" y="4" width="16" height="4" fill="none" stroke="#7c3aed" stroke-width="0.4" opacity="0.25"/>
-            <line x1="8" y1="0" x2="8" y2="4" stroke="#7c3aed" stroke-width="0.4" opacity="0.25"/>
-            <line x1="0" y1="4" x2="0" y2="8" stroke="#7c3aed" stroke-width="0.4" opacity="0.25"/>
+            <rect x="0" y="0" width="16" height="4" fill="none" stroke="var(--accent)" stroke-width="0.4" opacity="0.25"/>
+            <rect x="0" y="4" width="16" height="4" fill="none" stroke="var(--accent)" stroke-width="0.4" opacity="0.25"/>
+            <line x1="8" y1="0" x2="8" y2="4" stroke="var(--accent)" stroke-width="0.4" opacity="0.25"/>
+            <line x1="0" y1="4" x2="0" y2="8" stroke="var(--accent)" stroke-width="0.4" opacity="0.25"/>
           </pattern>
           <marker id="arr-fwd" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto">
-            <path d="M0,0 L0,7 L7,3.5 z" fill="#6d28d9"/>
+            <path d="M0,0 L0,7 L7,3.5 z" fill="var(--wire-data)"/>
           </marker>
-          <marker id="arr-fwd-d" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto">
-            <path d="M0,0 L0,7 L7,3.5 z" fill="#c084fc"/>
+          <marker id="arr-fwd-dark" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto">
+            <path d="M0,0 L0,7 L7,3.5 z" fill="var(--wire-data)"/>
           </marker>
-          <marker id="arr-bi" markerWidth="5" markerHeight="5" refX="1" refY="2.5" orient="auto-start-reverse">
-            <path d="M5,0 L5,5 L0,2.5 z" fill="#6d28d9"/>
+          <marker id="arr-power" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto">
+            <path d="M0,0 L0,7 L7,3.5 z" fill="var(--wire-power)"/>
+          </marker>
+          <marker id="arr-clock" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto">
+            <path d="M0,0 L0,7 L7,3.5 z" fill="var(--wire-clock)"/>
+          </marker>
+          <marker id="arr-control" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto">
+            <path d="M0,0 L0,7 L7,3.5 z" fill="var(--wire-control)"/>
           </marker>
         </defs>
         <g id="wires-layer"></g>
@@ -319,11 +534,34 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-famil
         <line id="wire-preview-line" class="wire-preview" x1="0" y1="0" x2="0" y2="0" style="display:none"/>
       </svg>
 
-      <!-- INSPECTOR -->
+      <!-- INSPECTOR PANEL -->
       <div id="inspector">
-        <div class="ins-title" id="ins-title">BLOCK INFO</div>
-        <div id="ins-rows"></div>
-        <button id="ins-delete">✕ Delete Block</button>
+        <div class="ins-title-row">
+          <span class="ins-title" id="ins-title">BLOCK INFO</span>
+          <button class="ins-close" id="ins-close" title="Close">✕</button>
+        </div>
+
+        <div class="ins-field">
+          <label>Block Title</label>
+          <input type="text" class="ins-input" id="ins-label-input">
+        </div>
+
+        <div class="ins-field">
+          <label>Subtitle / Details</label>
+          <input type="text" class="ins-input" id="ins-sub-input">
+        </div>
+
+        <div class="ins-specs-title">
+          <span>Specifications</span>
+          <button id="ins-add-spec" style="font-size:9px;border:none;background:var(--faint2);color:var(--accent);padding:2px 6px;border-radius:3px;cursor:pointer;">+ Add</button>
+        </div>
+        <div id="ins-specs-container"></div>
+
+        <div class="ins-actions">
+          <button class="ins-act-btn" id="ins-duplicate" title="Duplicate Block (Ctrl+D)">📋 Duplicate</button>
+          <button class="ins-act-btn" id="ins-rotate" title="Swap W/H">🔄 Rotate</button>
+          <button class="ins-act-btn danger" id="ins-delete" title="Delete Block">✕ Delete</button>
+        </div>
       </div>
 
       <!-- WIRE HINT -->
@@ -332,9 +570,77 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-famil
   </div>
 </div>
 
+<!-- CUSTOM BLOCK MODAL -->
+<div class="modal-overlay" id="custom-block-modal">
+  <div class="modal-card">
+    <div class="modal-title">
+      <span>➕ CREATE CUSTOM SILICON BLOCK</span>
+      <button class="ins-close" id="modal-close">✕</button>
+    </div>
+    <form id="custom-block-form">
+      <div class="modal-form-group">
+        <label>Block Label / Title</label>
+        <input type="text" id="cb-label" placeholder="e.g. TENSOR CORE v2" required>
+      </div>
+      <div class="modal-form-group">
+        <label>Subtitle / Key Feature</label>
+        <input type="text" id="cb-sub" placeholder="e.g. 16-bit FP · 32 TFLOPS">
+      </div>
+      <div class="modal-row">
+        <div class="modal-form-group">
+          <label>Category</label>
+          <select id="cb-cat">
+            <option value="COMPUTE">COMPUTE</option>
+            <option value="CACHE & MEMORY">CACHE & MEMORY</option>
+            <option value="INTERCONNECT">INTERCONNECT</option>
+            <option value="I/O & INTERFACE">I/O & INTERFACE</option>
+            <option value="ANALOG & CLOCK">ANALOG & CLOCK</option>
+            <option value="SECURITY & POWER">SECURITY & POWER</option>
+            <option value="CUSTOM">CUSTOM</option>
+          </select>
+        </div>
+        <div class="modal-form-group">
+          <label>Fill Color</label>
+          <input type="color" id="cb-color" value="#e0d8ff" style="height:34px;padding:2px;cursor:pointer;">
+        </div>
+      </div>
+      <div class="modal-row">
+        <div class="modal-form-group">
+          <label>Width (px)</label>
+          <input type="number" id="cb-w" value="150" min="80" max="400">
+        </div>
+        <div class="modal-form-group">
+          <label>Height (px)</label>
+          <input type="number" id="cb-h" value="100" min="40" max="300">
+        </div>
+      </div>
+      <div class="modal-form-group">
+        <label>Pattern Hatch</label>
+        <select id="cb-hatch">
+          <option value="hp-grid">Grid Pattern</option>
+          <option value="hp-cross">Cross Pattern</option>
+          <option value="hp-diag">Diagonal Lines</option>
+          <option value="hp-horiz">Horizontal Lines</option>
+          <option value="hp-vert">Vertical Lines</option>
+          <option value="hp-dots">Dot Matrix</option>
+          <option value="hp-wave">Wave Form</option>
+          <option value="hp-brick">Brick Layout</option>
+        </select>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn-secondary" id="cb-cancel">Cancel</button>
+        <button type="submit" class="btn-primary">Add Block to Library</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast"></div>
+
 <script>
 // ══════════════════════════════════════════════════════
-// BLOCK DEFINITIONS — full silicon dump
+// BLOCK DEFINITIONS — full silicon library
 // ══════════════════════════════════════════════════════
 const CATEGORIES = [
   { name: 'COMPUTE', blocks: [
@@ -443,19 +749,23 @@ const CATEGORIES = [
   ]},
 ];
 
-// flat lookup
+// flat lookup map
 const BLOCK_MAP = {};
-CATEGORIES.forEach(cat => cat.blocks.forEach(b => { BLOCK_MAP[b.id] = b; }));
+function rebuildBlockMap() {
+  CATEGORIES.forEach(cat => cat.blocks.forEach(b => { BLOCK_MAP[b.id] = b; }));
+}
+rebuildBlockMap();
 
 // ══════════════════════════════════════════════════════
-// STATE
+// STATE MANAGEMENT & HISTORY (UNDO / REDO)
 // ══════════════════════════════════════════════════════
-let blocks = [];      // {uid, defId, x, y, w, h, el}
-let wires = [];       // {uid, fromUid, toUid, el}
+let blocks = [];      // {uid, defId, customDef, x, y, w, h, label, sub, specs, el}
+let wires = [];       // {uid, fromUid, toUid, type, el}
 let callouts = [];    // {uid, x, y, lx, ly, num, el}
 let calloutCounter = 1;
 let selectedBlock = null;
-let mode = 'select'; // select | wire | callout
+let mode = 'select';  // select | wire | callout
+let currentWireType = 'data';
 let wireFromUid = null;
 let dark = false;
 let zoom = 1;
@@ -463,44 +773,159 @@ let panX = 0, panY = 0;
 let isDraggingBlock = false;
 let isPanning = false;
 let dragOffset = {x:0,y:0};
-let panStart = {x:0,y:0};
 let calloutPhase = 0; // 0=pick anchor, 1=pick label pos
 let pendingCallout = null;
 
+// History stacks
+const historyStack = [];
+const redoStack = [];
+const MAX_HISTORY = 30;
+
+function saveState() {
+  const state = {
+    blocks: blocks.map(b => ({
+      uid: b.uid, defId: b.defId, customDef: b.customDef || null,
+      x: b.x, y: b.y, w: b.w, h: b.h,
+      label: b.label || null, sub: b.sub || null,
+      specs: b.specs ? JSON.parse(JSON.stringify(b.specs)) : null
+    })),
+    wires: wires.map(w => ({ uid: w.uid, fromUid: w.fromUid, toUid: w.toUid, type: w.type || 'data' })),
+    callouts: callouts.map(c => ({ uid: c.uid, x: c.x, y: c.y, lx: c.lx, ly: c.ly, num: c.num })),
+    calloutCounter
+  };
+
+  historyStack.push(JSON.stringify(state));
+  if (historyStack.length > MAX_HISTORY) historyStack.shift();
+  redoStack.length = 0; // clear redo on new action
+  updateUndoRedoUI();
+  autoSaveLocalStorage();
+}
+
+function updateUndoRedoUI() {
+  document.getElementById('btn-undo').disabled = historyStack.length <= 1;
+  document.getElementById('btn-redo').disabled = redoStack.length === 0;
+}
+
+function undo() {
+  if (historyStack.length <= 1) return;
+  const currentState = historyStack.pop();
+  redoStack.push(currentState);
+  const previousState = historyStack[historyStack.length - 1];
+  restoreState(JSON.parse(previousState));
+  updateUndoRedoUI();
+  showToast('Undo performed');
+}
+
+function redo() {
+  if (redoStack.length === 0) return;
+  const nextState = redoStack.pop();
+  historyStack.push(nextState);
+  restoreState(JSON.parse(nextState));
+  updateUndoRedoUI();
+  showToast('Redo performed');
+}
+
+function restoreState(state) {
+  // Clear canvas elements
+  blocksLayer.innerHTML = '';
+  wiresLayer.innerHTML = '';
+  calloutsLayer.innerHTML = '';
+  hideInspector();
+
+  calloutCounter = state.calloutCounter || 1;
+  blocks = [];
+  wires = [];
+  callouts = [];
+
+  state.blocks.forEach(sb => {
+    let def = BLOCK_MAP[sb.defId];
+    if (!def && sb.customDef) {
+      def = sb.customDef;
+      BLOCK_MAP[def.id] = def;
+    }
+    if (def) {
+      const b = {
+        uid: sb.uid, defId: sb.defId, customDef: sb.customDef || null,
+        x: sb.x, y: sb.y, w: sb.w, h: sb.h,
+        label: sb.label || def.label, sub: sb.sub || def.sub,
+        specs: sb.specs || JSON.parse(JSON.stringify(def.specs))
+      };
+      blocks.push(b);
+      renderBlock(b);
+    }
+  });
+
+  state.wires.forEach(sw => {
+    const w = { uid: sw.uid, fromUid: sw.fromUid, toUid: sw.toUid, type: sw.type || 'data' };
+    wires.push(w);
+    renderWire(w);
+  });
+
+  state.callouts.forEach(sc => {
+    const c = { uid: sc.uid, x: sc.x, y: sc.y, lx: sc.lx, ly: sc.ly, num: sc.num };
+    callouts.push(c);
+    renderCallout(c);
+  });
+
+  updateStatus();
+}
+
+// ══════════════════════════════════════════════════════
+// DOM ELEMENTS
+// ══════════════════════════════════════════════════════
 const svg = document.getElementById('svg-canvas');
 const wiresLayer = document.getElementById('wires-layer');
 const blocksLayer = document.getElementById('blocks-layer');
 const calloutsLayer = document.getElementById('callouts-layer');
 const inspector = document.getElementById('inspector');
 const wireHint = document.getElementById('wire-hint');
-const statusBar = document.getElementById('status-bar');
+const stBlocks = document.getElementById('st-blocks');
+const stWires = document.getElementById('st-wires');
 
 // ══════════════════════════════════════════════════════
-// BUILD SIDEBAR
+// SIDEBAR RENDERING & SEARCH FILTER
 // ══════════════════════════════════════════════════════
-const blockList = document.getElementById('block-list');
-CATEGORIES.forEach(cat => {
-  const catEl = document.createElement('div');
-  catEl.className = 'block-category';
-  catEl.textContent = cat.name;
-  blockList.appendChild(catEl);
-  cat.blocks.forEach(b => {
-    const item = document.createElement('div');
-    item.className = 'block-item';
-    item.draggable = true;
-    item.dataset.defId = b.id;
-    item.innerHTML = `<div class="bi-swatch" style="background:${b.fill}"></div><div class="bi-label">${b.label}<br><span style="font-size:6.5px;opacity:0.6">${b.sub}</span></div>`;
-    item.addEventListener('dragstart', e => {
-      e.dataTransfer.setData('defId', b.id);
-    });
-    // touch drag for mobile
-    item.addEventListener('touchstart', onSidebarTouchStart, {passive:false});
-    blockList.appendChild(item);
+function renderSidebar() {
+  const blockList = document.getElementById('block-list');
+  blockList.innerHTML = '';
+  const filterText = document.getElementById('sidebar-filter').value.toLowerCase().trim();
+
+  CATEGORIES.forEach(cat => {
+    const matchingBlocks = cat.blocks.filter(b =>
+      b.label.toLowerCase().includes(filterText) || b.sub.toLowerCase().includes(filterText)
+    );
+
+    if (matchingBlocks.length > 0) {
+      const catEl = document.createElement('div');
+      catEl.className = 'block-category';
+      catEl.textContent = cat.name;
+      blockList.appendChild(catEl);
+
+      matchingBlocks.forEach(b => {
+        const item = document.createElement('div');
+        item.className = 'block-item';
+        item.draggable = true;
+        item.dataset.defId = b.id;
+        item.innerHTML = `
+          <div class="bi-swatch" style="background:${b.fill}"></div>
+          <div class="bi-info">
+            <span class="bi-label">${b.label}</span>
+            <span class="bi-sub">${b.sub}</span>
+          </div>
+        `;
+        item.addEventListener('dragstart', e => {
+          e.dataTransfer.setData('defId', b.id);
+        });
+        blockList.appendChild(item);
+      });
+    }
   });
-});
+}
+renderSidebar();
+document.getElementById('sidebar-filter').addEventListener('input', renderSidebar);
 
 // ══════════════════════════════════════════════════════
-// COORDINATE HELPERS
+// COORDINATE & TRANSFORM HELPERS
 // ══════════════════════════════════════════════════════
 function getCanvasPoint(clientX, clientY) {
   const rect = svg.getBoundingClientRect();
@@ -520,85 +945,86 @@ function applyTransform() {
 // BLOCK RENDERING
 // ══════════════════════════════════════════════════════
 function renderBlock(b) {
-  const def = BLOCK_MAP[b.defId];
+  const def = BLOCK_MAP[b.defId] || b.customDef;
+  if (!def) return;
+
   const g = document.createElementNS('http://www.w3.org/2000/svg','g');
   g.setAttribute('class','chip-block block-appear');
   g.dataset.uid = b.uid;
 
-  // main rect
+  // Main Rectangle
   const rect = document.createElementNS('http://www.w3.org/2000/svg','rect');
   rect.setAttribute('class','block-rect');
   rect.setAttribute('x', b.x); rect.setAttribute('y', b.y);
   rect.setAttribute('width', b.w); rect.setAttribute('height', b.h);
-  rect.setAttribute('fill', def.fill);
+  rect.setAttribute('fill', def.fill || '#e0d8ff');
   rect.setAttribute('stroke', 'var(--block-stroke)');
-  rect.setAttribute('stroke-width', '1');
-  rect.setAttribute('rx','1');
+  rect.setAttribute('stroke-width', '1.2');
+  rect.setAttribute('rx','4');
   g.appendChild(rect);
 
-  // hatch overlay
+  // Hatch Pattern Overlay
   const hatch = document.createElementNS('http://www.w3.org/2000/svg','rect');
   hatch.setAttribute('x', b.x); hatch.setAttribute('y', b.y);
   hatch.setAttribute('width', b.w); hatch.setAttribute('height', b.h);
-  hatch.setAttribute('fill', `url(#${def.hatch})`);
-  hatch.setAttribute('rx','1');
+  hatch.setAttribute('fill', `url(#${def.hatch || 'hp-grid'})`);
+  hatch.setAttribute('rx','4');
   g.appendChild(hatch);
 
-  // inner dashed rect
+  // Inner Border
   const inner = document.createElementNS('http://www.w3.org/2000/svg','rect');
   inner.setAttribute('class','block-inner');
   inner.setAttribute('x', b.x+5); inner.setAttribute('y', b.y+5);
   inner.setAttribute('width', b.w-10); inner.setAttribute('height', b.h-10);
   inner.setAttribute('fill','none');
   inner.setAttribute('stroke','var(--block-stroke)');
-  inner.setAttribute('stroke-width','0.4');
-  inner.setAttribute('stroke-dasharray','2,2');
+  inner.setAttribute('stroke-width','0.5');
+  inner.setAttribute('stroke-dasharray','3,2');
   inner.setAttribute('opacity','0.4');
   g.appendChild(inner);
 
-  // label
+  // Main Label
   const txt = document.createElementNS('http://www.w3.org/2000/svg','text');
   txt.setAttribute('x', b.x + b.w/2);
   txt.setAttribute('y', b.y + b.h/2 - 4);
   txt.setAttribute('text-anchor','middle');
   txt.setAttribute('dominant-baseline','middle');
-  txt.setAttribute('font-family','Share Tech Mono, monospace');
-  txt.setAttribute('font-size', Math.min(11, b.w/12));
+  txt.setAttribute('font-family','Fira Code, monospace');
+  txt.setAttribute('font-weight','700');
+  txt.setAttribute('font-size', Math.min(11, b.w/11));
   txt.setAttribute('fill','var(--label)');
-  txt.setAttribute('letter-spacing','1');
+  txt.setAttribute('letter-spacing','0.5');
   txt.setAttribute('pointer-events','none');
-  txt.textContent = def.label;
+  txt.textContent = b.label || def.label;
   g.appendChild(txt);
 
-  // sub-label
+  // Subtitle / Specs line
   const sub = document.createElementNS('http://www.w3.org/2000/svg','text');
   sub.setAttribute('x', b.x + b.w/2);
   sub.setAttribute('y', b.y + b.h/2 + 12);
   sub.setAttribute('text-anchor','middle');
   sub.setAttribute('dominant-baseline','middle');
-  sub.setAttribute('font-family','Courier Prime, monospace');
-  sub.setAttribute('font-size', Math.min(8, b.w/18));
+  sub.setAttribute('font-family','Inter, sans-serif');
+  sub.setAttribute('font-size', Math.min(8.5, b.w/16));
   sub.setAttribute('fill','var(--sublabel)');
   sub.setAttribute('pointer-events','none');
-  sub.setAttribute('font-style','italic');
-  sub.textContent = def.sub;
+  sub.textContent = b.sub || def.sub;
   g.appendChild(sub);
 
-  // resize handle
+  // Resize Handle
   const rh = document.createElementNS('http://www.w3.org/2000/svg','rect');
-  rh.setAttribute('x', b.x+b.w-8); rh.setAttribute('y', b.y+b.h-8);
-  rh.setAttribute('width',8); rh.setAttribute('height',8);
-  rh.setAttribute('fill','var(--accent)'); rh.setAttribute('opacity','0.6');
-  rh.setAttribute('cursor','se-resize');
-  rh.setAttribute('rx','1');
+  rh.setAttribute('x', b.x+b.w-9); rh.setAttribute('y', b.y+b.h-9);
+  rh.setAttribute('width',9); rh.setAttribute('height',9);
+  rh.setAttribute('fill','var(--accent)'); rh.setAttribute('opacity','0.7');
+  rh.setAttribute('cursor','se-resize'); rh.setAttribute('rx','2');
   rh.dataset.resize = b.uid;
   g.appendChild(rh);
 
-  // wire port dots
+  // Wire Connection Ports
   [[b.x+b.w/2, b.y],[b.x+b.w/2,b.y+b.h],[b.x,b.y+b.h/2],[b.x+b.w,b.y+b.h/2]].forEach(([px,py]) => {
     const port = document.createElementNS('http://www.w3.org/2000/svg','circle');
     port.setAttribute('cx',px); port.setAttribute('cy',py);
-    port.setAttribute('r',3); port.setAttribute('fill','var(--accent)');
+    port.setAttribute('r',4); port.setAttribute('fill','var(--accent)');
     port.setAttribute('opacity','0'); port.setAttribute('cursor','crosshair');
     port.setAttribute('class','wire-port');
     port.dataset.blockUid = b.uid;
@@ -606,13 +1032,11 @@ function renderBlock(b) {
   });
 
   g.addEventListener('mousedown', onBlockMousedown);
-  g.addEventListener('touchstart', onBlockTouchstart, {passive:false});
   blocksLayer.appendChild(g);
   b.el = g;
 
-  // show ports on hover if in wire mode
   g.addEventListener('mouseenter', () => {
-    if (mode==='wire') g.querySelectorAll('.wire-port').forEach(p=>p.setAttribute('opacity','0.8'));
+    if (mode==='wire') g.querySelectorAll('.wire-port').forEach(p=>p.setAttribute('opacity','0.9'));
   });
   g.addEventListener('mouseleave', () => {
     g.querySelectorAll('.wire-port').forEach(p=>p.setAttribute('opacity','0'));
@@ -622,18 +1046,16 @@ function renderBlock(b) {
 function refreshBlock(b) {
   if (b.el) b.el.remove();
   renderBlock(b);
-  // reselect visually
   if (selectedBlock && selectedBlock.uid === b.uid) {
     b.el.classList.add('selected');
   }
-  // update wires that connect to this block
   wires.forEach(w => {
     if (w.fromUid===b.uid || w.toUid===b.uid) renderWire(w);
   });
 }
 
 // ══════════════════════════════════════════════════════
-// WIRE RENDERING
+// WIRE RENDERING & TYPES
 // ══════════════════════════════════════════════════════
 function blockCenter(uid) {
   const b = blocks.find(x=>x.uid===uid);
@@ -641,24 +1063,37 @@ function blockCenter(uid) {
   return {x: b.x+b.w/2, y: b.y+b.h/2};
 }
 
+const WIRE_STYLES = {
+  data:    { stroke: 'var(--wire-data)',    marker: 'arr-fwd',     dash: '6,3' },
+  power:   { stroke: 'var(--wire-power)',   marker: 'arr-power',   dash: 'none' },
+  clock:   { stroke: 'var(--wire-clock)',   marker: 'arr-clock',   dash: '2,4' },
+  control: { stroke: 'var(--wire-control)', marker: 'arr-control', dash: '4,4' },
+};
+
 function renderWire(w) {
   if (w.el) w.el.remove();
   const a = blockCenter(w.fromUid);
   const b2 = blockCenter(w.toUid);
   const path = document.createElementNS('http://www.w3.org/2000/svg','path');
-  // orthogonal routing
+
+  // Orthogonal Routing
   const mx = (a.x+b2.x)/2;
   const d = `M ${a.x} ${a.y} L ${mx} ${a.y} L ${mx} ${b2.y} L ${b2.x} ${b2.y}`;
   path.setAttribute('d', d);
+
+  const style = WIRE_STYLES[w.type || 'data'] || WIRE_STYLES.data;
   path.setAttribute('class','wire-path wire-animated');
-  path.setAttribute('stroke-dasharray','6,3');
-  path.setAttribute('marker-end', dark ? 'url(#arr-fwd-d)' : 'url(#arr-fwd)');
+  path.setAttribute('stroke', style.stroke);
+  if (style.dash !== 'none') path.setAttribute('stroke-dasharray', style.dash);
+  path.setAttribute('marker-end', `url(#${style.marker})`);
   path.dataset.wireUid = w.uid;
+
   path.addEventListener('click', () => {
     if (mode==='select') {
-      if (confirm('Delete this wire?')) {
+      if (confirm('Delete this connection wire?')) {
         path.remove();
         wires = wires.filter(x=>x.uid!==w.uid);
+        saveState();
         updateStatus();
       }
     }
@@ -676,29 +1111,35 @@ function renderCallout(c) {
   const line = document.createElementNS('http://www.w3.org/2000/svg','line');
   line.setAttribute('x1',c.x); line.setAttribute('y1',c.y);
   line.setAttribute('x2',c.lx); line.setAttribute('y2',c.ly);
-  line.setAttribute('stroke','var(--ink)'); line.setAttribute('stroke-width','0.7');
+  line.setAttribute('stroke','var(--ink)'); line.setAttribute('stroke-width','1');
   g.appendChild(line);
+
   const dot = document.createElementNS('http://www.w3.org/2000/svg','circle');
   dot.setAttribute('cx',c.x); dot.setAttribute('cy',c.y);
-  dot.setAttribute('r','2.5'); dot.setAttribute('fill','var(--ink)');
+  dot.setAttribute('r','3'); dot.setAttribute('fill','var(--accent)');
   g.appendChild(dot);
+
   const num = document.createElementNS('http://www.w3.org/2000/svg','text');
   const side = c.lx >= c.x ? 1 : -1;
-  num.setAttribute('x', c.lx + side*5);
+  num.setAttribute('x', c.lx + side*6);
   num.setAttribute('y', c.ly);
   num.setAttribute('text-anchor', side>0 ? 'start' : 'end');
   num.setAttribute('dominant-baseline','middle');
-  num.setAttribute('font-family','Courier Prime, monospace');
-  num.setAttribute('font-size','13');
+  num.setAttribute('font-family','Fira Code, monospace');
+  num.setAttribute('font-size','12');
   num.setAttribute('font-weight','700');
-  num.setAttribute('fill','var(--label)');
+  num.setAttribute('fill','var(--accent)');
   num.setAttribute('class','callout-num');
   num.textContent = c.num;
   g.appendChild(num);
+
   g.dataset.calloutUid = c.uid;
   g.addEventListener('click', ()=>{
     if (mode==='select') {
-      if (confirm('Delete callout?')) { g.remove(); callouts=callouts.filter(x=>x.uid!==c.uid); }
+      if (confirm('Delete callout annotation?')) {
+        g.remove(); callouts=callouts.filter(x=>x.uid!==c.uid);
+        saveState();
+      }
     }
   });
   calloutsLayer.appendChild(g);
@@ -706,41 +1147,148 @@ function renderCallout(c) {
 }
 
 // ══════════════════════════════════════════════════════
-// INSPECTOR
+// INSPECTOR PANEL & EDITING
 // ══════════════════════════════════════════════════════
 function showInspector(b) {
   selectedBlock = b;
-  const def = BLOCK_MAP[b.defId];
+  const def = BLOCK_MAP[b.defId] || b.customDef;
   document.getElementById('ins-title').textContent = def.label;
-  const rows = document.getElementById('ins-rows');
-  rows.innerHTML = '';
-  Object.entries(def.specs).forEach(([k,v]) => {
-    rows.innerHTML += `<div class="ins-row"><span class="ins-key">${k}</span><span class="ins-val">${v}</span></div>`;
-  });
+  document.getElementById('ins-label-input').value = b.label || def.label;
+  document.getElementById('ins-sub-input').value = b.sub || def.sub;
+
+  renderInspectorSpecs(b);
   inspector.style.display = 'block';
 }
+
+function renderInspectorSpecs(b) {
+  const container = document.getElementById('ins-specs-container');
+  container.innerHTML = '';
+
+  const specs = b.specs || {};
+  Object.entries(specs).forEach(([k,v]) => {
+    const row = document.createElement('div');
+    row.className = 'ins-spec-row';
+    row.innerHTML = `
+      <input type="text" class="ins-input ins-spec-k" value="${k}">
+      <input type="text" class="ins-input ins-spec-v" value="${v}">
+      <button class="ins-spec-del">✕</button>
+    `;
+    const kInput = row.querySelector('.ins-spec-k');
+    const vInput = row.querySelector('.ins-spec-v');
+    const delBtn = row.querySelector('.ins-spec-del');
+
+    const updateSpecs = () => {
+      const newSpecs = {};
+      container.querySelectorAll('.ins-spec-row').forEach(r => {
+        const key = r.querySelector('.ins-spec-k').value.trim();
+        const val = r.querySelector('.ins-spec-v').value.trim();
+        if (key) newSpecs[key] = val;
+      });
+      b.specs = newSpecs;
+      saveState();
+    };
+
+    kInput.addEventListener('change', updateSpecs);
+    vInput.addEventListener('change', updateSpecs);
+    delBtn.addEventListener('click', () => {
+      row.remove();
+      updateSpecs();
+    });
+
+    container.appendChild(row);
+  });
+}
+
+document.getElementById('ins-label-input').addEventListener('input', e => {
+  if (selectedBlock) {
+    selectedBlock.label = e.target.value;
+    refreshBlock(selectedBlock);
+  }
+});
+document.getElementById('ins-label-input').addEventListener('change', () => saveState());
+
+document.getElementById('ins-sub-input').addEventListener('input', e => {
+  if (selectedBlock) {
+    selectedBlock.sub = e.target.value;
+    refreshBlock(selectedBlock);
+  }
+});
+document.getElementById('ins-sub-input').addEventListener('change', () => saveState());
+
+document.getElementById('ins-add-spec').onclick = () => {
+  if (!selectedBlock) return;
+  if (!selectedBlock.specs) selectedBlock.specs = {};
+  selectedBlock.specs['Key'] = 'Value';
+  renderInspectorSpecs(selectedBlock);
+  saveState();
+};
+
 function hideInspector() {
   if (selectedBlock) {
-    selectedBlock.el.classList.remove('selected');
+    if (selectedBlock.el) selectedBlock.el.classList.remove('selected');
     selectedBlock = null;
   }
   inspector.style.display = 'none';
 }
+document.getElementById('ins-close').onclick = hideInspector;
 
+// DUPLICATE BLOCK
+function duplicateSelectedBlock() {
+  if (!selectedBlock) return;
+  const b = selectedBlock;
+  const def = BLOCK_MAP[b.defId] || b.customDef;
+  const newBlock = {
+    uid: uid(),
+    defId: b.defId,
+    customDef: b.customDef || null,
+    x: b.x + 24,
+    y: b.y + 24,
+    w: b.w,
+    h: b.h,
+    label: b.label || def.label,
+    sub: b.sub || def.sub,
+    specs: b.specs ? JSON.parse(JSON.stringify(b.specs)) : null
+  };
+  blocks.push(newBlock);
+  renderBlock(newBlock);
+  showInspector(newBlock);
+  saveState();
+  updateStatus();
+  showToast('Block duplicated');
+}
+document.getElementById('ins-duplicate').onclick = duplicateSelectedBlock;
+
+// ROTATE / SWAP DIMENSIONS
+document.getElementById('ins-rotate').onclick = () => {
+  if (!selectedBlock) return;
+  const temp = selectedBlock.w;
+  selectedBlock.w = selectedBlock.h;
+  selectedBlock.h = temp;
+  refreshBlock(selectedBlock);
+  saveState();
+};
+
+// DELETE BLOCK
 document.getElementById('ins-delete').onclick = () => {
   if (!selectedBlock) return;
+  const targetUid = selectedBlock.uid;
   selectedBlock.el.remove();
   wires = wires.filter(w => {
-    if (w.fromUid===selectedBlock.uid || w.toUid===selectedBlock.uid) { if(w.el) w.el.remove(); return false; }
+    if (w.fromUid===targetUid || w.toUid===targetUid) {
+      if(w.el) w.el.remove();
+      return false;
+    }
     return true;
   });
-  blocks = blocks.filter(b => b.uid !== selectedBlock.uid);
+  blocks = blocks.filter(b => b.uid !== targetUid);
   hideInspector();
+  saveState();
   updateStatus();
+  showToast('Block deleted');
 };
 
 // ══════════════════════════════════════════════════════
-// INTERACTION — BLOCK DRAG
+// BLOCK INTERACTION & DRAGGING
 // ══════════════════════════════════════════════════════
 let draggingBlock = null;
 let resizingBlock = null;
@@ -750,22 +1298,20 @@ function onBlockMousedown(e) {
   if (mode !== 'select') return;
   e.preventDefault(); e.stopPropagation();
 
-  // check resize
+  // Check Resize Handle
   const resizeUid = e.target.dataset && e.target.dataset.resize;
   if (resizeUid) {
     resizingBlock = blocks.find(b=>b.uid===resizeUid);
     resizeStart = { mx: e.clientX, my: e.clientY, w: resizingBlock.w, h: resizingBlock.h };
     return;
   }
-  // check wire port
   if (e.target.classList && e.target.classList.contains('wire-port')) return;
 
   const uid = e.currentTarget.dataset.uid;
   const b = blocks.find(x=>x.uid===uid);
   if (!b) return;
 
-  // select
-  if (selectedBlock) selectedBlock.el.classList.remove('selected');
+  if (selectedBlock && selectedBlock.el) selectedBlock.el.classList.remove('selected');
   b.el.classList.add('selected');
   showInspector(b);
 
@@ -775,31 +1321,14 @@ function onBlockMousedown(e) {
   isDraggingBlock = true;
 }
 
-function onBlockTouchstart(e) {
-  if (mode !== 'select') return;
-  e.preventDefault(); e.stopPropagation();
-  const t = e.touches[0];
-  const uid = e.currentTarget.dataset.uid;
-  const b = blocks.find(x=>x.uid===uid);
-  if (!b) return;
-  if (selectedBlock) selectedBlock.el.classList.remove('selected');
-  b.el.classList.add('selected');
-  showInspector(b);
-  const pt = getCanvasPoint(t.clientX, t.clientY);
-  draggingBlock = b;
-  dragOffset = { x: pt.x - b.x, y: pt.y - b.y };
-  isDraggingBlock = true;
-}
-
 // ══════════════════════════════════════════════════════
-// INTERACTION — CANVAS EVENTS
+// CANVAS MOUSE EVENTS
 // ══════════════════════════════════════════════════════
 let canvasPanStart = null;
 
 svg.addEventListener('mousedown', e => {
   if (e.target === svg || e.target.id === 'svg-canvas') {
     if (mode === 'select') {
-      // start pan
       isPanning = true;
       canvasPanStart = { x: e.clientX - panX, y: e.clientY - panY };
       hideInspector();
@@ -808,13 +1337,14 @@ svg.addEventListener('mousedown', e => {
       if (calloutPhase === 0) {
         pendingCallout = {x: pt.x, y: pt.y};
         calloutPhase = 1;
-        wireHint.textContent = 'NOW CLICK TO PLACE THE LABEL NUMBER';
+        wireHint.textContent = 'CLICK TO PLACE ANNOTATION NUMBER';
       } else {
         const c = { uid: uid(), num: calloutCounter++, x: pendingCallout.x, y: pendingCallout.y, lx: pt.x, ly: pt.y };
         callouts.push(c);
         renderCallout(c);
         calloutPhase = 0; pendingCallout = null;
         wireHint.textContent = 'CLICK ANYWHERE TO START CALLOUT';
+        saveState();
       }
     }
   }
@@ -842,7 +1372,7 @@ svg.addEventListener('mousemove', e => {
     refreshBlock(resizingBlock);
     return;
   }
-  // wire preview line
+  // Wire preview
   if (mode === 'wire' && wireFromUid) {
     const c = blockCenter(wireFromUid);
     const pt = getCanvasPoint(e.clientX, e.clientY);
@@ -853,61 +1383,36 @@ svg.addEventListener('mousemove', e => {
 });
 
 document.addEventListener('mouseup', () => {
+  if (isDraggingBlock || resizingBlock) {
+    saveState();
+  }
   isDraggingBlock = false; draggingBlock = null;
   resizingBlock = null; resizeStart = null;
   isPanning = false; canvasPanStart = null;
 });
 
-// Touch pan
-svg.addEventListener('touchstart', e => {
-  if (e.touches.length === 1 && !isDraggingBlock) {
-    const t = e.touches[0];
-    if (e.target === svg || e.target.id === 'svg-canvas') {
-      isPanning = true;
-      canvasPanStart = { x: t.clientX - panX, y: t.clientY - panY };
-    }
-  }
-}, {passive:true});
-svg.addEventListener('touchmove', e => {
-  if (e.touches.length === 1) {
-    const t = e.touches[0];
-    if (isPanning && canvasPanStart) {
-      panX = t.clientX - canvasPanStart.x;
-      panY = t.clientY - canvasPanStart.y;
-      applyTransform();
-    }
-    if (isDraggingBlock && draggingBlock) {
-      const pt = getCanvasPoint(t.clientX, t.clientY);
-      draggingBlock.x = snap(pt.x - dragOffset.x);
-      draggingBlock.y = snap(pt.y - dragOffset.y);
-      refreshBlock(draggingBlock);
-    }
-  }
-}, {passive:true});
-svg.addEventListener('touchend', () => {
-  isDraggingBlock = false; draggingBlock = null;
-  isPanning = false; canvasPanStart = null;
-});
-
-// ── WIRE MODE CLICKS ──
+// ── WIRE MODE CLICK ──
 svg.addEventListener('click', e => {
   if (mode !== 'wire') return;
   const blockEl = e.target.closest('.chip-block');
   if (!blockEl) return;
   const uid2 = blockEl.dataset.uid;
+
   if (!wireFromUid) {
     wireFromUid = uid2;
     blockEl.classList.add('selected');
     document.getElementById('wire-preview-line').style.display = 'block';
     wireHint.textContent = 'CLICK TARGET BLOCK TO CONNECT';
   } else if (wireFromUid !== uid2) {
-    const w = { uid: uid(), fromUid: wireFromUid, toUid: uid2 };
+    const w = { uid: uid(), fromUid: wireFromUid, toUid: uid2, type: currentWireType };
     wires.push(w);
     renderWire(w);
-    blocks.find(b=>b.uid===wireFromUid)?.el.classList.remove('selected');
+    const sourceBlock = blocks.find(b=>b.uid===wireFromUid);
+    if (sourceBlock && sourceBlock.el) sourceBlock.el.classList.remove('selected');
     wireFromUid = null;
     document.getElementById('wire-preview-line').style.display = 'none';
     wireHint.textContent = 'CLICK BLOCK TO START WIRE · CLICK ANOTHER TO CONNECT';
+    saveState();
     updateStatus();
   }
 });
@@ -920,69 +1425,215 @@ canvasWrap.addEventListener('drop', e => {
   const defId = e.dataTransfer.getData('defId');
   if (!defId) return;
   const def = BLOCK_MAP[defId];
+  if (!def) return;
   const pt = getCanvasPoint(e.clientX, e.clientY);
-  const b = { uid: uid(), defId, x: snap(pt.x - def.w/2), y: snap(pt.y - def.h/2), w: def.w, h: def.h };
+  const b = {
+    uid: uid(), defId, x: snap(pt.x - def.w/2), y: snap(pt.y - def.h/2),
+    w: def.w, h: def.h, label: def.label, sub: def.sub,
+    specs: JSON.parse(JSON.stringify(def.specs))
+  };
   blocks.push(b);
   renderBlock(b);
+  saveState();
   updateStatus();
-});
-
-// ── TOUCH DRAG FROM SIDEBAR (mobile) ──
-let touchDragDefId = null;
-let touchDragGhost = null;
-function onSidebarTouchStart(e) {
-  touchDragDefId = e.currentTarget.dataset.defId;
-  const t = e.touches[0];
-  touchDragGhost = document.createElement('div');
-  touchDragGhost.style.cssText = `position:fixed;pointer-events:none;z-index:9998;background:var(--paper2);border:1px solid var(--border);padding:4px 8px;font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--accent);opacity:0.8;letter-spacing:1px;`;
-  touchDragGhost.textContent = BLOCK_MAP[touchDragDefId].label;
-  document.body.appendChild(touchDragGhost);
-}
-document.addEventListener('touchmove', e => {
-  if (!touchDragDefId) return;
-  const t = e.touches[0];
-  if (touchDragGhost) {
-    touchDragGhost.style.left = (t.clientX+10)+'px';
-    touchDragGhost.style.top = (t.clientY-20)+'px';
-  }
-},{passive:true});
-document.addEventListener('touchend', e => {
-  if (!touchDragDefId) return;
-  const t = e.changedTouches[0];
-  if (touchDragGhost) { touchDragGhost.remove(); touchDragGhost=null; }
-  const rect = svg.getBoundingClientRect();
-  if (t.clientX >= rect.left && t.clientX <= rect.right && t.clientY >= rect.top && t.clientY <= rect.bottom) {
-    const def = BLOCK_MAP[touchDragDefId];
-    const pt = getCanvasPoint(t.clientX, t.clientY);
-    const b = { uid: uid(), defId: touchDragDefId, x: snap(pt.x-def.w/2), y: snap(pt.y-def.h/2), w:def.w, h:def.h };
-    blocks.push(b); renderBlock(b); updateStatus();
-  }
-  touchDragDefId = null;
+  showToast(`Added ${def.label}`);
 });
 
 // ══════════════════════════════════════════════════════
-// TOOLBAR BUTTONS
+// CUSTOM BLOCK CREATOR MODAL
+// ══════════════════════════════════════════════════════
+const customBlockModal = document.getElementById('custom-block-modal');
+document.getElementById('btn-custom-block').onclick = () => {
+  customBlockModal.style.display = 'flex';
+};
+document.getElementById('modal-close').onclick = () => {
+  customBlockModal.style.display = 'none';
+};
+document.getElementById('cb-cancel').onclick = () => {
+  customBlockModal.style.display = 'none';
+};
+
+document.getElementById('custom-block-form').onsubmit = e => {
+  e.preventDefault();
+  const label = document.getElementById('cb-label').value.toUpperCase().trim();
+  const sub = document.getElementById('cb-sub').value.trim() || 'Custom Silicon Module';
+  const catName = document.getElementById('cb-cat').value;
+  const fill = document.getElementById('cb-color').value;
+  const w = parseInt(document.getElementById('cb-w').value, 10) || 150;
+  const h = parseInt(document.getElementById('cb-h').value, 10) || 100;
+  const hatch = document.getElementById('cb-hatch').value;
+
+  const customId = 'custom_' + Date.now();
+  const customDef = {
+    id: customId, label, sub, fill, hatch, w, h,
+    specs: { 'Type': 'Custom User Block', 'Status': 'Active' }
+  };
+
+  // Add to CATEGORIES
+  let catObj = CATEGORIES.find(c => c.name === catName);
+  if (!catObj) {
+    catObj = { name: catName, blocks: [] };
+    CATEGORIES.push(catObj);
+  }
+  catObj.blocks.push(customDef);
+  rebuildBlockMap();
+  renderSidebar();
+
+  // Instantly place center of canvas
+  const pt = { x: (svg.clientWidth/2 - panX)/zoom, y: (svg.clientHeight/2 - panY)/zoom };
+  const b = {
+    uid: uid(), defId: customId, customDef, x: snap(pt.x - w/2), y: snap(pt.y - h/2),
+    w, h, label, sub, specs: JSON.parse(JSON.stringify(customDef.specs))
+  };
+  blocks.push(b);
+  renderBlock(b);
+  saveState();
+  updateStatus();
+
+  customBlockModal.style.display = 'none';
+  showToast(`Custom block "${label}" created!`);
+  document.getElementById('custom-block-form').reset();
+};
+
+// ══════════════════════════════════════════════════════
+// ARCHITECTURE PRESET TEMPLATES
+// ══════════════════════════════════════════════════════
+const TEMPLATES = {
+  'mobile-soc': {
+    blocks: [
+      { defId: 'cpu', x: 100, y: 100, w: 160, h: 110 },
+      { defId: 'cpu_e', x: 280, y: 100, w: 140, h: 90 },
+      { defId: 'gpu', x: 100, y: 240, w: 180, h: 130 },
+      { defId: 'npu', x: 300, y: 240, w: 150, h: 120 },
+      { defId: 'l3', x: 100, y: 390, w: 350, h: 70 },
+      { defId: 'lpddr', x: 480, y: 240, w: 155, h: 220 },
+      { defId: 'sec', x: 480, y: 100, w: 155, h: 120 },
+    ],
+    wires: [
+      { fromIdx: 0, toIdx: 4, type: 'data' },
+      { fromIdx: 1, toIdx: 4, type: 'data' },
+      { fromIdx: 2, toIdx: 4, type: 'data' },
+      { fromIdx: 3, toIdx: 4, type: 'data' },
+      { fromIdx: 4, toIdx: 5, type: 'data' },
+      { fromIdx: 6, toIdx: 0, type: 'control' }
+    ]
+  },
+  'ai-engine': {
+    blocks: [
+      { defId: 'npu', x: 260, y: 120, w: 180, h: 140 },
+      { defId: 'sram', x: 80, y: 120, w: 140, h: 140 },
+      { defId: 'dsp', x: 480, y: 120, w: 150, h: 140 },
+      { defId: 'noc', x: 80, y: 300, w: 550, h: 60 },
+      { defId: 'lpddr', x: 260, y: 390, w: 180, h: 90 },
+    ],
+    wires: [
+      { fromIdx: 1, toIdx: 3, type: 'data' },
+      { fromIdx: 0, toIdx: 3, type: 'data' },
+      { fromIdx: 2, toIdx: 3, type: 'data' },
+      { fromIdx: 3, toIdx: 4, type: 'data' }
+    ]
+  },
+  'riscv-mcu': {
+    blocks: [
+      { defId: 'cpu', x: 100, y: 100, w: 150, h: 100, label: 'RISC-V CORE', sub: 'RV32IMC · 100MHz' },
+      { defId: 'sram', x: 280, y: 100, w: 130, h: 70 },
+      { defId: 'rom', x: 430, y: 100, w: 120, h: 60 },
+      { defId: 'apb', x: 100, y: 220, w: 450, h: 36 },
+      { defId: 'periph', x: 100, y: 290, w: 165, h: 80 },
+      { defId: 'adc', x: 280, y: 290, w: 140, h: 80 },
+      { defId: 'pmic', x: 440, y: 290, w: 110, h: 80 },
+    ],
+    wires: [
+      { fromIdx: 0, toIdx: 3, type: 'data' },
+      { fromIdx: 1, toIdx: 3, type: 'data' },
+      { fromIdx: 2, toIdx: 3, type: 'data' },
+      { fromIdx: 3, toIdx: 4, type: 'control' },
+      { fromIdx: 3, toIdx: 5, type: 'control' },
+      { fromIdx: 6, toIdx: 0, type: 'power' }
+    ]
+  }
+};
+
+document.getElementById('template-select').onchange = e => {
+  const key = e.target.value;
+  const tmpl = TEMPLATES[key];
+  if (!tmpl) return;
+
+  if (blocks.length > 0 && !confirm('Load template? Existing canvas elements will be replaced.')) {
+    e.target.value = '';
+    return;
+  }
+
+  blocksLayer.innerHTML = '';
+  wiresLayer.innerHTML = '';
+  calloutsLayer.innerHTML = '';
+  hideInspector();
+  blocks = []; wires = []; callouts = []; calloutCounter = 1;
+
+  const uidMap = [];
+  tmpl.blocks.forEach(tb => {
+    const def = BLOCK_MAP[tb.defId];
+    if (!def) return;
+    const b = {
+      uid: uid(), defId: tb.defId, x: tb.x, y: tb.y,
+      w: tb.w || def.w, h: tb.h || def.h,
+      label: tb.label || def.label, sub: tb.sub || def.sub,
+      specs: JSON.parse(JSON.stringify(def.specs))
+    };
+    blocks.push(b);
+    uidMap.push(b.uid);
+    renderBlock(b);
+  });
+
+  tmpl.wires.forEach(tw => {
+    const w = {
+      uid: uid(),
+      fromUid: uidMap[tw.fromIdx],
+      toUid: uidMap[tw.toIdx],
+      type: tw.type || 'data'
+    };
+    wires.push(w);
+    renderWire(w);
+  });
+
+  saveState();
+  updateStatus();
+  showToast('Template loaded successfully');
+  e.target.value = '';
+};
+
+// ══════════════════════════════════════════════════════
+// TOOLBAR ACTIONS & MODE SWITCHING
 // ══════════════════════════════════════════════════════
 function setMode(m) {
   mode = m;
   wireFromUid = null;
   calloutPhase = 0; pendingCallout = null;
   document.getElementById('wire-preview-line').style.display = 'none';
+
   ['btn-select','btn-wire','btn-callout'].forEach(id=>document.getElementById(id).classList.remove('active'));
-  if (m==='select') { document.getElementById('btn-select').classList.add('active'); wireHint.style.display='none'; }
-  if (m==='wire')   { document.getElementById('btn-wire').classList.add('active'); wireHint.style.display='block'; wireHint.textContent='CLICK BLOCK TO START WIRE · CLICK ANOTHER TO CONNECT'; }
-  if (m==='callout'){ document.getElementById('btn-callout').classList.add('active'); wireHint.style.display='block'; wireHint.textContent='CLICK ANYWHERE TO START CALLOUT'; }
+  if (m==='select')  { document.getElementById('btn-select').classList.add('active'); wireHint.style.display='none'; }
+  if (m==='wire')    { document.getElementById('btn-wire').classList.add('active'); wireHint.style.display='block'; wireHint.textContent='CLICK BLOCK TO START WIRE · CLICK ANOTHER TO CONNECT'; }
+  if (m==='callout') { document.getElementById('btn-callout').classList.add('active'); wireHint.style.display='block'; wireHint.textContent='CLICK ANYWHERE TO START CALLOUT'; }
 }
 
 document.getElementById('btn-select').onclick  = () => setMode('select');
 document.getElementById('btn-wire').onclick    = () => setMode('wire');
 document.getElementById('btn-callout').onclick = () => setMode('callout');
 
-document.getElementById('btn-zoomin').onclick  = () => { zoom = Math.min(zoom*1.25, 4); applyTransform(); };
-document.getElementById('btn-zoomout').onclick = () => { zoom = Math.max(zoom/1.25, 0.2); applyTransform(); };
+document.getElementById('wire-type-select').onchange = e => {
+  currentWireType = e.target.value;
+};
+
+// UNDO / REDO CONTROLS
+document.getElementById('btn-undo').onclick = undo;
+document.getElementById('btn-redo').onclick = redo;
+
+// ZOOM CONTROLS
+document.getElementById('btn-zoomin').onclick  = () => { zoom = Math.min(zoom*1.2, 4); applyTransform(); };
+document.getElementById('btn-zoomout').onclick = () => { zoom = Math.max(zoom/1.2, 0.2); applyTransform(); };
 document.getElementById('btn-fit').onclick     = () => { zoom=1; panX=0; panY=0; applyTransform(); };
 
-// mousewheel zoom
 canvasWrap.addEventListener('wheel', e => {
   e.preventDefault();
   const factor = e.deltaY < 0 ? 1.1 : 0.9;
@@ -990,62 +1641,192 @@ canvasWrap.addEventListener('wheel', e => {
   applyTransform();
 }, {passive:false});
 
+// CLEAR ALL
 document.getElementById('btn-clearall').onclick = () => {
-  if (!confirm('Clear everything?')) return;
+  if (!confirm('Clear entire canvas layout?')) return;
   blocks=[]; wires=[]; callouts=[]; calloutCounter=1;
   blocksLayer.innerHTML=''; wiresLayer.innerHTML=''; calloutsLayer.innerHTML='';
-  hideInspector(); updateStatus();
+  hideInspector();
+  saveState();
+  updateStatus();
+  showToast('Canvas cleared');
 };
 
-// THEME
+// THEME SWITCHING
 document.getElementById('btn-theme').onclick = () => {
-  const f = document.getElementById('tflash');
-  f.classList.add('on');
-  setTimeout(()=>f.classList.remove('on'),120);
-  setTimeout(()=>{
-    dark = !dark;
-    document.body.setAttribute('data-theme', dark?'dark':'');
-    document.getElementById('btn-theme').textContent = dark ? '○ Light' : '◐ Dark';
-  }, 60);
+  dark = !dark;
+  document.body.setAttribute('data-theme', dark ? 'dark' : '');
+  document.getElementById('btn-theme').textContent = dark ? '○ Light' : '◐ Dark';
+  showToast(dark ? 'Dark Mode Activated' : 'Light Mode Activated');
 };
 
-// EXPORT
+// SAVE / LOAD JSON
+document.getElementById('btn-save').onclick = () => {
+  const exportData = {
+    version: '2.0',
+    timestamp: new Date().toISOString(),
+    blocks: blocks.map(b => ({
+      uid: b.uid, defId: b.defId, customDef: b.customDef || null,
+      x: b.x, y: b.y, w: b.w, h: b.h,
+      label: b.label, sub: b.sub, specs: b.specs
+    })),
+    wires: wires.map(w => ({ uid: w.uid, fromUid: w.fromUid, toUid: w.toUid, type: w.type })),
+    callouts: callouts.map(c => ({ uid: c.uid, x: c.x, y: c.y, lx: c.lx, ly: c.ly, num: c.num })),
+    calloutCounter
+  };
+
+  const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `chip-layout-${Date.now()}.json`;
+  a.click();
+  showToast('Layout JSON saved');
+};
+
+document.getElementById('btn-load').onclick = () => {
+  document.getElementById('file-input').click();
+};
+
+document.getElementById('file-input').onchange = e => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = evt => {
+    try {
+      const data = JSON.parse(evt.target.result);
+      if (data && data.blocks) {
+        historyStack.length = 0;
+        redoStack.length = 0;
+        restoreState(data);
+        saveState();
+        showToast('Layout JSON loaded');
+      } else {
+        alert('Invalid JSON layout file structure.');
+      }
+    } catch (err) {
+      alert('Error parsing JSON file: ' + err.message);
+    }
+  };
+  reader.readAsText(file);
+  e.target.value = '';
+};
+
+// EXPORT SVG
 document.getElementById('btn-export').onclick = () => {
   const clone = svg.cloneNode(true);
   const rect = svg.getBoundingClientRect();
   clone.setAttribute('xmlns','http://www.w3.org/2000/svg');
-  clone.setAttribute('width', rect.width); clone.setAttribute('height', rect.height);
-  // embed fonts
+  clone.setAttribute('width', rect.width);
+  clone.setAttribute('height', rect.height);
+
   const style = document.createElementNS('http://www.w3.org/2000/svg','style');
-  style.textContent = `@import url('https://fonts.googleapis.com/css2?family=Special+Elite&family=Share+Tech+Mono&family=Courier+Prime:ital,wght@0,400;0,700;1,400&display=swap');`;
+  style.textContent = `@import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;700&family=Inter:wght@400;700&display=swap');`;
   clone.insertBefore(style, clone.firstChild);
+
   const blob = new Blob([clone.outerHTML],{type:'image/svg+xml'});
-  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download='chip-design.svg'; a.click();
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `silicon-canvas-${Date.now()}.svg`;
+  a.click();
+  showToast('Exported SVG diagram');
 };
 
-// keyboard shortcuts
+// KEYBOARD SHORTCUTS
 document.addEventListener('keydown', e => {
   if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+
+  // Undo / Redo
+  if ((e.ctrlKey || e.metaKey) && (e.key === 'z' || e.key === 'Z')) {
+    if (e.shiftKey) redo();
+    else undo();
+    e.preventDefault();
+    return;
+  }
+  if ((e.ctrlKey || e.metaKey) && (e.key === 'y' || e.key === 'Y')) {
+    redo();
+    e.preventDefault();
+    return;
+  }
+
+  // Duplicate Block (Ctrl+D)
+  if ((e.ctrlKey || e.metaKey) && (e.key === 'd' || e.key === 'D')) {
+    e.preventDefault();
+    duplicateSelectedBlock();
+    return;
+  }
+
   if (e.key==='s'||e.key==='S') setMode('select');
   if (e.key==='w'||e.key==='W') setMode('wire');
   if (e.key==='c'||e.key==='C') setMode('callout');
   if (e.key==='+'||e.key==='=') { zoom=Math.min(zoom*1.2,4); applyTransform(); }
   if (e.key==='-') { zoom=Math.max(zoom/1.2,0.2); applyTransform(); }
   if (e.key==='f'||e.key==='F') { zoom=1;panX=0;panY=0;applyTransform(); }
-  if ((e.key==='Delete'||e.key==='Backspace') && selectedBlock) document.getElementById('ins-delete').click();
+  if ((e.key==='Delete'||e.key==='Backspace') && selectedBlock) {
+    document.getElementById('ins-delete').click();
+  }
   if (e.key==='Escape') { setMode('select'); hideInspector(); }
 });
 
 // ══════════════════════════════════════════════════════
-// UTILS
+// LOCALSTORAGE AUTO-SAVE
+// ══════════════════════════════════════════════════════
+function autoSaveLocalStorage() {
+  const data = {
+    blocks: blocks.map(b => ({
+      uid: b.uid, defId: b.defId, customDef: b.customDef || null,
+      x: b.x, y: b.y, w: b.w, h: b.h, label: b.label, sub: b.sub, specs: b.specs
+    })),
+    wires: wires.map(w => ({ uid: w.uid, fromUid: w.fromUid, toUid: w.toUid, type: w.type })),
+    callouts: callouts.map(c => ({ uid: c.uid, x: c.x, y: c.y, lx: c.lx, ly: c.ly, num: c.num })),
+    calloutCounter
+  };
+  try {
+    localStorage.setItem('silicon_canvas_layout', JSON.stringify(data));
+  } catch (err) {}
+}
+
+function loadLocalStorage() {
+  try {
+    const raw = localStorage.getItem('silicon_canvas_layout');
+    if (raw) {
+      const data = JSON.parse(raw);
+      if (data && data.blocks && data.blocks.length > 0) {
+        restoreState(data);
+        saveState();
+        showToast('Restored previous layout');
+        return true;
+      }
+    }
+  } catch (e) {}
+  return false;
+}
+
+// ══════════════════════════════════════════════════════
+// UTILITY FUNCTIONS
 // ══════════════════════════════════════════════════════
 let _uid = 1;
-function uid() { return 'b' + (_uid++); }
+function uid() { return 'b' + Date.now().toString(36) + (_uid++); }
 
 function updateStatus() {
-  statusBar.textContent = `BLOCKS: ${blocks.length} · WIRES: ${wires.length} · MODE: ${mode.toUpperCase()}`;
+  stBlocks.textContent = `BLOCKS: ${blocks.length}`;
+  stWires.textContent = `WIRES: ${wires.length}`;
 }
-updateStatus();
+
+function showToast(msg) {
+  const toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.style.display = 'block';
+  setTimeout(() => { toast.style.display = 'none'; }, 2200);
+}
+
+// Initial initialization
+const restored = loadLocalStorage();
+if (!restored) {
+  // Load default template if empty canvas
+  document.getElementById('template-select').value = 'mobile-soc';
+  document.getElementById('template-select').dispatchEvent(new Event('change'));
+}
+
 applyTransform();
 </script>
 </body>
