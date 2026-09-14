@@ -18,7 +18,7 @@ Chip is developed with a multi-agent workflow. Human contributions remain the so
       <sub>Implementation</sub>
     </td>
     <td align="center" width="120">
-      <img src="https://cdn.simpleicons.org/openai/FFFFFF" width="40" height="40" alt="OpenAI"/><br/>
+      <img src="https://openai.com/favicon.ico" width="40" height="40" alt="OpenAI"/><br/>
       <b>Codex</b><br/>
       <sub>Code Review</sub>
     </td>
@@ -35,7 +35,7 @@ Chip is developed with a multi-agent workflow. Human contributions remain the so
   </tr>
   <tr>
     <td align="center" width="120">
-      <img src="https://cdn.simpleicons.org/manus/FFFFFF" width="40" height="40" alt="Manus"/><br/>
+      <img src="https://manus.im/favicon.ico" width="40" height="40" alt="Manus"/><br/>
       <b>Manus</b><br/>
       <sub>Development</sub>
     </td>
@@ -50,7 +50,7 @@ Chip is developed with a multi-agent workflow. Human contributions remain the so
       <sub>LLM Support</sub>
     </td>
     <td align="center" width="120">
-      👤<br/>
+      <div style="font-size:40px;line-height:40px">👤</div>
       <b>Yuri</b><br/>
       <sub>Owner · Final say</sub>
     </td>
