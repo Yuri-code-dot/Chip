@@ -13,44 +13,44 @@ Chip is developed with a multi-agent workflow. Human contributions remain the so
 <table>
   <tr>
     <td align="center" width="120">
-      <img src="https://cdn.simpleicons.org/google/4285F4" width="40" height="40" alt="Google"/><br/>
+      <img src="https://github.com/google.png?size=80" width="40" height="40" alt="Google"/><br/>
       <b>Jules</b><br/>
       <sub>Implementation</sub>
     </td>
     <td align="center" width="120">
-      <img src="https://openai.com/favicon.ico" width="40" height="40" alt="OpenAI"/><br/>
+      <img src="https://github.com/openai.png?size=80" width="40" height="40" alt="OpenAI"/><br/>
       <b>Codex</b><br/>
       <sub>Code Review</sub>
     </td>
     <td align="center" width="120">
-      <img src="https://cdn.simpleicons.org/github/FFFFFF" width="40" height="40" alt="GitHub"/><br/>
+      <img src="https://github.com/github.png?size=80" width="40" height="40" alt="GitHub"/><br/>
       <b>Copilot</b><br/>
       <sub>Code Review</sub>
     </td>
     <td align="center" width="120">
-      <img src="https://cdn.simpleicons.org/anthropic/FFFFFF" width="40" height="40" alt="Anthropic"/><br/>
+      <img src="https://github.com/anthropics.png?size=80" width="40" height="40" alt="Anthropic"/><br/>
       <b>Claude Code</b><br/>
       <sub>Development</sub>
     </td>
   </tr>
   <tr>
     <td align="center" width="120">
-      <img src="https://manus.im/favicon.ico" width="40" height="40" alt="Manus"/><br/>
+      <img src="https://github.com/manus-ai.png?size=80" width="40" height="40" alt="Manus"/><br/>
       <b>Manus</b><br/>
       <sub>Development</sub>
     </td>
     <td align="center" width="120">
-      <img src="https://cdn.simpleicons.org/alibabacloud/FF6A00" width="40" height="40" alt="Alibaba Cloud"/><br/>
+      <img src="https://github.com/QwenLM.png?size=80" width="40" height="40" alt="Qwen"/><br/>
       <b>Qwen</b><br/>
       <sub>LLM Support</sub>
     </td>
     <td align="center" width="120">
-      <img src="https://cdn.simpleicons.org/deepseek/4D6BFE" width="40" height="40" alt="DeepSeek"/><br/>
+      <img src="https://github.com/deepseek-ai.png?size=80" width="40" height="40" alt="DeepSeek"/><br/>
       <b>DeepSeek</b><br/>
       <sub>LLM Support</sub>
     </td>
     <td align="center" width="120">
-      <div style="font-size:40px;line-height:40px">👤</div>
+      <div style="font-size:40px;line-height:40px;font-weight:700;">Y</div>
       <b>Yuri</b><br/>
       <sub>Owner · Final say</sub>
     </td>
