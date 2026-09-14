@@ -6,9 +6,9 @@
 
 ---
 
-## 🤖 AI Agent Contributors
+## 🧠 LLM Agent Contributors
 
-Chip is developed with a multi-agent workflow. Human contributions remain the source of truth, while AI agents can implement changes, review code, test ideas, and help iterate on the project.
+Chip is developed with a multi-agent workflow. Human contributions remain the source of truth, while LLM agents can implement changes, review code, test ideas, and help iterate on the project.
 
 <table>
   <tr>
@@ -57,7 +57,7 @@ Chip is developed with a multi-agent workflow. Human contributions remain the so
   </tr>
 </table>
 
-> **Note:** GitHub's native Contributors graph only counts accounts that make commits. The table above is the project's AI collaboration roster, so reviewers and assistants can be credited without pretending they authored commits they did not make.
+> **Note:** GitHub's native Contributors graph only counts accounts that make commits. The table above is the project's LLM collaboration roster, so reviewers and assistants can be credited without pretending they authored commits they did not make.
 
 ---
 
